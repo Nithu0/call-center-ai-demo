@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% block title %}Dokumentert effekt — Loyalty AI{% endblock %}
+{% block content %}
+
+<style>
+  /* Scoped til effekt-siden — egen lane, ingen felles CSS-fil røres. */
+  .eval-lead { color: var(--muted); max-width: 70ch; }
+  .eval-grid { display: grid; gap: 20px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 18px 0 6px; }
+  .ekpi { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .ekpi-label { color: var(--muted); font-size: 0.82rem; }
+  .ekpi-value { font-size: 2rem; font-weight: 700; line-height: 1.1; margin-top: 4px; }
+  .ekpi-value .u { font-size: 1rem; color: var(--muted); font-weight: 600; }
+  .ekpi-foot { color: var(--muted); font-size: 0.78rem; margin-top: 4px; }
+  .good { color: var(--pass); } .warn { color: var(--warn); } .bad { color: var(--fail); }
+
+  .eval-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .eval-table th, .eval-table td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+  .eval-table th.num, .eval-table td.num { text-align: right; }
+  .eval-table tbody tr:hover { background: #f8fafc; }
+  .acc-pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-weight: 700; font-size: 0.82rem; }
+  .acc-good { background: #dafbe1; color: #116329; }
+  .acc-mid  { background: var(--warn-bg); color: var(--warn); }
+  .acc-bad  { background: #ffebe9; color: var(--fail); }
+  .mini { color: var(--muted); font-size: 0.78rem; }
+  .chk { font-weight: 700; } .chk-ok { color: var(--pass); } .chk-no { color: var(--fail); }
+
+  .roi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: start; }
+  @media (max-width: 720px) { .roi-grid { grid-template-columns: 1fr; } }
+  .roi-field { margin-bottom: 16px; }
+  .roi-field label { display: block; font-weight: 600; margin-bottom: 6px; }
+  .roi-field .rv { color: var(--accent); font-weight: 700; }
+  .roi-field input[type=range] { width: 100%; accent-color: var(--accent); }
+  .roi-out { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .roi-out .big { font-size: 2.4rem; font-weight: 800; color: var(--pass); line-height: 1.1; }
+  .roi-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+  .roi-line:last-child { border-bottom: 0; }
+  .roi-line .k { color: var(--muted); }
+  .roi-line .v { font-weight: 700; }
+
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; counter-reset: step; }
+  .step { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; position: relative; }
+  .step::before { counter-increment: step; content: counter(step); display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; }
+  .step h3 { margin: 0 0 6px; font-size: 1rem; }
+  .step p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+  .note-box { background: var(--warn-bg); border: 1px solid #efd884; color: var(--warn);
+    border-radius: 10px; padding: 12px 14px; font-size: 0.9rem; }
+</style>
+
+<p><a class="back" href="/">&larr; Alle samtaler</a></p>
+<h1>Dokumentert effekt <span class="dash-sub">· pilot med målbar verdi</span></h1>
+<p class="eval-lead">
+  Loyalty kjøper ikke «AI» — Loyalty kjøper <strong>dokumentert effekt</strong>. Denne siden
+  måler to ting: hvor godt AI-en treffer en menneskelig gull-fasit (nøyaktighet), og hvor mye
+  tid og kroner den frigjør (ROI). Tallene under er regnet på {{ n_total }} demo-samtaler.
+</p>
+
+<!-- ============ 1. NØYAKTIGHET ============ -->
+<section class="panel" style="margin-bottom: 22px;">
+  <h2>1 · Nøyaktighet mot gull-fasit</h2>
+
+  {% if not labels_present %}
+  <div class="note-box">
+    Gull-fasit (<code>data/_labels.json</code>) er ikke lagt inn ennå. Når en menneske-labelet
+    fasit finnes, fylles tabellen automatisk med per-samtale enighet og en total nøyaktighet.
+    Foreløpig vises AI-ens egne klassifiseringer som referanse.
+  </div>
+
+  <div class="kpi-row">
+    <div class="ekpi">
+      <div class="ekpi-label">Total nøyaktighet</div>
+      <div class="ekpi-value">—</div>
+      <div class="ekpi-foot">venter på fasit</div>
+    </div>
+    <div class="ekpi">
+      <div class="ekpi-label">Samtaler med fasit</div>
+      <div class="ekpi-value">0<span class="u"> / {{ n_total }}</span></div>
+    </div>
+  </div>
+
+  <table class="eval-table">
+    <thead>
+      <tr><th>Samtale</th><th>AI sentiment</th><th>AI årsak</th><th class="num">QA-punkter</th></tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td><a href="/call/{{ r.name }}">{{ r.title }}</a></td>
+        <td>{{ r.ai_sentiment }}</td>
+        <td>{{ r.ai_reason }}</td>
+        <td class="num">{{ r.card_total }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% else %}
+  <div class="kpi-row">
+    <div class="ekpi">
+      <div class="ekpi-label">Total nøyaktighet</div>
+      <div class="ekpi-value {{ 'good' if overall_accuracy >= 80 else ('warn' if overall_accuracy >= 60 else 'bad') }}">
+        {{ overall_accuracy }}<span class="u">%</span>
+      </div>
+      <div class="ekpi-foot">{{ total_matches }} / {{ total_points }} sammenligningspunkter</div>
+    </div>
+    <div class="ekpi">
+      <div class="ekpi-label">Samtaler med fasit</div>
+      <div class="ekpi-value">{{ n_labeled }}<span class="u"> / {{ n_total }}</span></div>
+      <div class="ekpi-foot">scorecard + sentiment + årsak pr. samtale</div>
+    </div>
+    <div class="ekpi">
+      <div class="ekpi-label">Hva vi sammenligner</div>
+      <div class="ekpi-foot" style="margin-top: 8px;">
+        Hvert QA-punkt (0/1), sentiment og henvendelsesårsak holdes opp mot en
+        menneske-labelet fasit. Enighet i prosent = nøyaktighet.
+      </div>
+    </div>
+  </div>
+
+  <table class="eval-table">
+    <thead>
+      <tr>
+        <th>Samtale</th>
+        <th class="num">Enighet</th>
+        <th class="num">Scorecard</th>
+        <th>Sentiment</th>
+        <th>Årsak</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>
+          <a href="/call/{{ r.name }}">{{ r.title }}</a>
+          {% if not r.has_gold %}<span class="mini"> · ingen fasit</span>{% endif %}
+        </td>
+        {% if r.has_gold %}
+        <td class="num">
+          <span class="acc-pill {{ 'acc-good' if r.percent >= 80 else ('acc-mid' if r.percent >= 60 else 'acc-bad') }}">{{ r.percent }}%</span>
+          <div class="mini">{{ r.matches }}/{{ r.total }}</div>
+        </td>
+        <td class="num">
+          {{ r.card_match }}/{{ r.card_total }}
+          <div class="mini">QA-punkter</div>
+        </td>
+        <td>
+          {% if r.sentiment_known %}
+            <span class="chk {{ 'chk-ok' if r.sentiment_agree else 'chk-no' }}">{{ '✓' if r.sentiment_agree else '✗' }}</span>
+            <span class="mini">AI: {{ r.ai_sentiment }} / fasit: {{ r.gold_sentiment }}</span>
+          {% else %}<span class="mini">—</span>{% endif %}
+        </td>
+        <td>
+          {% if r.reason_known %}
+            <span class="chk {{ 'chk-ok' if r.reason_agree else 'chk-no' }}">{{ '✓' if r.reason_agree else '✗' }}</span>
+            <span class="mini">AI: {{ r.ai_reason }} / fasit: {{ r.gold_reason }}</span>
+          {% else %}<span class="mini">—</span>{% endif %}
+        </td>
+        {% else %}
+        <td class="num"><span class="mini">—</span></td>
+        <td class="num"><span class="mini">{{ r.card_total }} punkter</span></td>
+        <td><span class="mini">AI: {{ r.ai_sentiment }}</span></td>
+        <td><span class="mini">AI: {{ r.ai_reason }}</span></td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+
+<!-- ============ 2. TIDSBESPARELSE ============ -->
+<section class="panel" style="margin-bottom: 22px;">
+  <h2>2 · Tidsbesparelse</h2>
+  <p class="eval-lead">
+    Manuell QA av én samtale tar typisk <strong>{{ min_per_manual_qa }} min</strong> (lytte,
+    score sjekklisten, notere). AI-en gjør samme jobb på <strong>~{{ ai_seconds_per_call }} sekunder</strong> —
+    og på <em>alle</em> samtaler, ikke et stikkprøve-utvalg på 1–2 %.
+  </p>
+  <div class="kpi-row" id="time-kpis">
+    <div class="ekpi">
+      <div class="ekpi-label">Manuelt pr. {{ '{:,}'.format(calls_per_month).replace(',', ' ') }} samtaler</div>
+      <div class="ekpi-value" id="kpi-manual-hours">—<span class="u"> t/mnd</span></div>
+      <div class="ekpi-foot">{{ min_per_manual_qa }} min × volum</div>
+    </div>
+    <div class="ekpi">
+      <div class="ekpi-label">Med AI</div>
+      <div class="ekpi-value good" id="kpi-ai-hours">—<span class="u"> t/mnd</span></div>
+      <div class="ekpi-foot">~{{ ai_seconds_per_call }} sek × volum</div>
+    </div>
+    <div class="ekpi">
+      <div class="ekpi-label">Spart tid</div>
+      <div class="ekpi-value good" id="kpi-saved-hours">—<span class="u"> t/mnd</span></div>
+      <div class="ekpi-foot" id="kpi-saved-fte">— årsverk frigjort</div>
+    </div>
+    <div class="ekpi">
+      <div class="ekpi-label">QA-dekning</div>
+      <div class="ekpi-value">100<span class="u">%</span></div>
+      <div class="ekpi-foot">mot ~1–2 % ved stikkprøver</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. INTERAKTIV ROI ============ -->
+<section class="panel" style="margin-bottom: 22px;">
+  <h2>3 · ROI-kalkulator</h2>
+  <p class="eval-lead">Juster antakelsene til Loyaltys virkelighet — tallene oppdateres live.</p>
+  <div class="roi-grid">
+    <div>
+      <div class="roi-field">
+        <label>Samtaler / måned: <span class="rv" id="v-calls">{{ calls_per_month }}</span></label>
+        <input type="range" id="in-calls" min="100" max="20000" step="100" value="{{ calls_per_month }}" />
+      </div>
+      <div class="roi-field">
+        <label>Min. manuell QA / samtale: <span class="rv" id="v-min">{{ min_per_manual_qa }}</span></label>
+        <input type="range" id="in-min" min="2" max="20" step="1" value="{{ min_per_manual_qa }}" />
+      </div>
+      <div class="roi-field">
+        <label>Timekost QA-ressurs (kr): <span class="rv" id="v-cost">{{ hourly_cost }}</span></label>
+        <input type="range" id="in-cost" min="200" max="900" step="10" value="{{ hourly_cost }}" />
+      </div>
+      <p class="mini">
+        Antar AI-en gjør jobben tilnærmet gratis tidsmessig (~{{ ai_seconds_per_call }} sek/samtale).
+        Beregningen viser den manuelle QA-tiden AI-en erstatter.
+      </p>
+    </div>
+
+    <div class="roi-out">
+      <div class="ekpi-label">Estimert besparelse</div>
+      <div class="big" id="roi-year">—</div>
+      <div class="mini" style="margin-bottom: 12px;">pr. år</div>
+      <div class="roi-line"><span class="k">Spart tid</span><span class="v" id="roi-hours-mo">— t/mnd</span></div>
+      <div class="roi-line"><span class="k">Spart tid</span><span class="v" id="roi-hours-yr">— t/år</span></div>
+      <div class="roi-line"><span class="k">Frigjorte årsverk</span><span class="v" id="roi-fte">—</span></div>
+      <div class="roi-line"><span class="k">Besparelse / måned</span><span class="v" id="roi-month">—</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. PILOT-NARRATIV ============ -->
+<section class="panel">
+  <h2>4 · Slik kjører vi en pilot med målbar effekt</h2>
+  <div class="steps">
+    <div class="step">
+      <h3>Baseline</h3>
+      <p>Loyalty labeler 30–50 samtaler manuelt etter dagens QA-sjekkliste. Det blir
+         gull-fasiten og nullpunktet vi måler mot.</p>
+    </div>
+    <div class="step">
+      <h3>Pilot</h3>
+      <p>AI-en kjøres på de samme samtalene (samme kode, Azure EU-region). Ingen
+         endring i arbeidsflyt — vi måler først, endrer ingenting.</p>
+    </div>
+    <div class="step">
+      <h3>Måling</h3>
+      <p>Vi rapporterer nøyaktighet pr. punkt (tabellen over) + spart tid/kroner.
+         Akseptkriterium avtales på forhånd, f.eks. ≥ 85 % enighet.</p>
+    </div>
+    <div class="step">
+      <h3>Skalering</h3>
+      <p>Når akseptkriteriet er nådd, skrus AI på 100 % av volumet. QA går fra
+         stikkprøve til full dekning — uten flere QA-årsverk.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Vanilla JS — ingen eksterne libs. Kobler slidere → live tidsbesparelse + kr/år.
+  (function () {
+    var AI_SEC = {{ ai_seconds_per_call }};      // AI-sekunder pr. samtale
+    var HOURS_PER_FTE_YEAR = 1695;               // ~årsverk (NO-standard arbeidstid)
+
+    var inCalls = document.getElementById("in-calls");
+    var inMin   = document.getElementById("in-min");
+    var inCost  = document.getElementById("in-cost");
+
+    var vCalls = document.getElementById("v-calls");
+    var vMin   = document.getElementById("v-min");
+    var vCost  = document.getElementById("v-cost");
+
+    function nf(n) { return Math.round(n).toLocaleString("nb-NO"); }
+    function kr(n) { return "kr " + nf(n); }
+
+    function recalc() {
+      var calls = +inCalls.value;
+      var min   = +inMin.value;
+      var cost  = +inCost.value;
+
+      vCalls.textContent = nf(calls);
+      vMin.textContent   = min;
+      vCost.textContent  = nf(cost);
+
+      var manualHoursMo = (calls * min) / 60;
+      var aiHoursMo     = (calls * AI_SEC) / 3600;
+      var savedHoursMo  = Math.max(manualHoursMo - aiHoursMo, 0);
+      var savedHoursYr  = savedHoursMo * 12;
+      var savedYearKr   = savedHoursYr * cost;
+      var savedMonthKr  = savedHoursMo * cost;
+      var fte           = savedHoursYr / HOURS_PER_FTE_YEAR;
+
+      // Seksjon 2 (faste antakelser-KPIer speiler slider-verdiene live).
+      set("kpi-manual-hours", nf(manualHoursMo), " t/mnd");
+      set("kpi-ai-hours", aiHoursMo < 1 ? "<1" : nf(aiHoursMo), " t/mnd");
+      set("kpi-saved-hours", nf(savedHoursMo), " t/mnd");
+      var fteEl = document.getElementById("kpi-saved-fte");
+      if (fteEl) fteEl.textContent = fte.toFixed(1) + " årsverk frigjort";
+
+      // Seksjon 3 (ROI-boks).
+      document.getElementById("roi-year").textContent     = kr(savedYearKr);
+      document.getElementById("roi-hours-mo").textContent = nf(savedHoursMo) + " t/mnd";
+      document.getElementById("roi-hours-yr").textContent = nf(savedHoursYr) + " t/år";
+      document.getElementById("roi-fte").textContent      = fte.toFixed(1);
+      document.getElementById("roi-month").textContent    = kr(savedMonthKr);
+    }
+
+    function set(id, value, unit) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = value + '<span class="u">' + (unit || "") + "</span>";
+    }
+
+    [inCalls, inMin, inCost].forEach(function (el) {
+      el.addEventListener("input", recalc);
+    });
+    recalc();
+  })();
+</script>
+{% endblock %}

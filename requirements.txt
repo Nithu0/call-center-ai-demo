@@ -1,0 +1,20 @@
+# --- Kjernen (kreves for offline mock-demo) ---
+fastapi>=0.110
+uvicorn[standard]>=0.29
+jinja2>=3.1
+pydantic>=2.6
+python-multipart>=0.0.9   # FastAPI form/POST-håndtering
+
+# --- Tester ---
+pytest>=8.0
+httpx>=0.27               # FastAPI TestClient
+
+# --- VALGFRIE backends (ikke nødvendig for mock/offline) ---
+# Avkommenter + installer kun hvis du vil kjøre en ekte backend:
+#
+# anthropic>=0.40                     # LLM_BACKEND=anthropic (claude-opus-4-8)
+# openai>=1.40                        # LLM_BACKEND=azure-openai (Azure OpenAI)
+# azure-cognitiveservices-speech>=1.37  # STT_BACKEND=azure (Azure AI Speech)
+# faster-whisper>=1.0                 # STT_BACKEND=faster-whisper (lokal Whisper)
+# transformers>=4.40                  # STT_BACKEND=nb-whisper (NB-Whisper)
+# torch>=2.2                          # kreves av nb-whisper

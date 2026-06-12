@@ -1,0 +1,106 @@
+{
+  "salg_alarm": {
+    "call_reason": "Utgående salg av boligalarm/forsikring",
+    "sentiment": "positiv",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 0,
+      "avslutning": 1
+    },
+    "total_pct": 83
+  },
+  "kundeservice_faktura": {
+    "call_reason": "Feil på faktura, for høyt beløp",
+    "sentiment": "nøytral",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 0,
+      "avslutning": 1
+    },
+    "total_pct": 83
+  },
+  "salg_forsikring": {
+    "call_reason": "Utgående salg av innboforsikring",
+    "sentiment": "positiv",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 1,
+      "avslutning": 1
+    },
+    "total_pct": 100
+  },
+  "kundeservice_klage": {
+    "call_reason": "Klage på gjentatte internett-utfall, ikke løst tidligere",
+    "sentiment": "negativ",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 0,
+      "avslutning": 1
+    },
+    "total_pct": 83
+  },
+  "retention_oppsigelse": {
+    "call_reason": "Kunde vil si opp pga pris, beholdt på lettpakke",
+    "sentiment": "positiv",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 1,
+      "avslutning": 1
+    },
+    "total_pct": 100
+  },
+  "booking_time": {
+    "call_reason": "Booke time for gjennomgang av strømavtale",
+    "sentiment": "positiv",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 0,
+      "avslutning": 1
+    },
+    "total_pct": 83
+  },
+  "support_teknisk": {
+    "call_reason": "Teknisk feil, wifi nede pga løs fiberkabel",
+    "sentiment": "positiv",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 0,
+      "avslutning": 1
+    },
+    "total_pct": 83
+  },
+  "inkasso_betaling": {
+    "call_reason": "Ubetalt faktura til inkasso, betalingsavtale opprettet",
+    "sentiment": "nøytral",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 1,
+      "avslutning": 1
+    },
+    "total_pct": 100
+  }
+}

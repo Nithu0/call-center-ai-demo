@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Live tale-til-tekst — Loyalty AI{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="/static/live.css" />
+
+<p><a class="back" href="/">← Alle samtaler</a></p>
+
+<div class="call-header">
+  <span class="badge badge-kundeservice">live</span>
+  <h1>🎙️ Live tale-til-tekst</h1>
+  <span class="call-header-meta">Snakk inn en samtale — se teksten komme live</span>
+</div>
+
+<div class="split">
+  <!-- VENSTRE: opptak + live-transkript -->
+  <section class="panel transcript-panel">
+    <div class="panel-head">
+      <h2>📝 Live-transkript</h2>
+      <span id="live-status" class="live-status live-status-idle">Klar</span>
+    </div>
+
+    <!-- Web Speech-modus -->
+    <div id="speech-ui" hidden>
+      <div class="live-controls">
+        <button id="record-btn" class="btn btn-record" type="button">
+          <span class="rec-dot"></span>
+          <span id="record-label">🎙️ Start opptak</span>
+        </button>
+        <span id="timer" class="live-timer">00:00</span>
+        <div class="level-wrap" title="Lyd-nivå">
+          <div id="level-bar" class="level-bar"></div>
+        </div>
+      </div>
+
+      <div class="speaker-pick">
+        <span class="speaker-pick-label">Hvem snakker:</span>
+        <label><input type="radio" name="speaker" value="alt" checked /> Samle alt</label>
+        <label><input type="radio" name="speaker" value="agent" /> Agent</label>
+        <label><input type="radio" name="speaker" value="kunde" /> Kunde</label>
+      </div>
+
+      <div id="transcript-box" class="transcript live-transcript" aria-live="polite">
+        <p id="transcript-empty" class="live-empty">Trykk «Start opptak» og begynn å snakke …</p>
+        <div id="transcript-final"></div>
+        <span id="transcript-interim" class="interim"></span>
+      </div>
+
+      <div class="live-actions">
+        <button id="clear-btn" class="btn btn-ghost" type="button">🗑️ Tøm</button>
+        <button id="analyze-btn" class="btn btn-primary" type="button" disabled>✨ Analyser denne samtalen</button>
+      </div>
+    </div>
+
+    <!-- Mat den med et OPPTAK (privat backend-STT: NB-Whisper / OpenAI / Azure) -->
+    <div class="upload-box" style="margin-top:1rem;padding:1rem;border:1px dashed var(--border,#334);border-radius:12px;">
+      <h3 style="margin:0 0 .3rem;">📁 Eller mat den med et opptak</h3>
+      <p class="live-empty" style="margin:.2rem 0 .6rem;">
+        Last opp en lydfil (wav/mp3/m4a). Transkriberes via <b>backend-STT</b>
+        (<code id="up-backend">…</code>) — den private produksjonsveien, ikke nettleseren.
+      </p>
+      <div class="live-actions" style="gap:.6rem;flex-wrap:wrap;">
+        <input type="file" id="audio-file" accept="audio/*">
+        <button id="upload-btn" class="btn btn-primary" type="button">⬆️ Transkriber &amp; analyser</button>
+      </div>
+      <div id="upload-result" hidden style="margin-top:.6rem;">
+        <div id="upload-transcript" class="transcript" style="white-space:pre-wrap;"></div>
+      </div>
+    </div>
+
+    <!-- Fallback-modus (ingen Web Speech API) -->
+    <div id="fallback-ui" hidden>
+      <div class="fallback-note">
+        <strong>Live tale-til-tekst krever Chrome / Edge (Web Speech API).</strong>
+        Nettleseren din støtter den ikke — men demoen virker likevel: lim inn eller
+        skriv en samtale under og analyser den med samme AI.
+      </div>
+      <textarea id="fallback-text" class="fallback-text" rows="12"
+        placeholder="Agent: Hei, du snakker med Loyalty …&#10;Kunde: Hei, jeg ringer fordi …"></textarea>
+      <div class="live-actions">
+        <button id="fallback-analyze-btn" class="btn btn-primary" type="button">✨ Analyser denne samtalen</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- HØYRE: AI-analyse -->
+  <section class="panel analysis-panel" id="analysis-panel">
+    <div class="analysis-head">
+      <h2>✨ AI-analyse</h2>
+    </div>
+    <div id="analysis-body" class="analysis-body-anim">
+      <p class="live-empty">Analysen vises her etter at du har analysert en samtale.</p>
+    </div>
+  </section>
+</div>
+
+<script src="/static/live.js"></script>
+<script>
+/* Opplastings-vei: opptak → /transcribe (backend-STT) → /analyze-text. Selvstendig. */
+(function () {
+  const btn = document.getElementById("upload-btn");
+  if (!btn) return;
+  const fileInput = document.getElementById("audio-file");
+  const box = document.getElementById("upload-result");
+  const tBox = document.getElementById("upload-transcript");
+  const body = document.getElementById("analysis-body");
+  fetch("/healthz").then(r => r.json()).then(h => {
+    const b = document.getElementById("up-backend");
+    if (b) b.textContent = h.stt_backend + (h.stt_backend === "mock" ? " (sett STT_BACKEND=openai for ekte)" : "");
+  }).catch(() => {});
+  btn.addEventListener("click", async () => {
+    if (!fileInput.files.length) { alert("Velg en lydfil først."); return; }
+    btn.disabled = true; const orig = btn.textContent; btn.textContent = "⏳ Transkriberer …";
+    try {
+      const fd = new FormData(); fd.append("file", fileInput.files[0]);
+      const r = await fetch("/transcribe", { method: "POST", body: fd });
+      const d = await r.json();
+      const tr = d.transcript || {};
+      const text = (tr.turns || []).map(t => `${t.speaker}: ${t.text}`).join("\n") || "(tomt)";
+      box.hidden = false;
+      tBox.textContent = text + (d.note ? "\n\n⚠️ " + d.note : "");
+      btn.textContent = "✨ Analyserer …";
+      const a = await fetch("/analyze-text", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, call_type: "kundeservice" }),
+      });
+      const an = ((await a.json()).analysis) || {};
+      if (body) {
+        const pct = (an.scorecard && an.scorecard.percent) || 0;
+        body.innerHTML =
+          `<div class="panel-inset" style="padding:.8rem;border:1px solid var(--border,#334);border-radius:10px;">
+             <p><b>Sentiment:</b> ${an.sentiment || "?"} · <b>Churn:</b> ${an.churn_risk || "?"} · <b>QA:</b> ${pct}%</p>
+             <p><b>Sammendrag:</b> ${an.summary || ""}</p>
+           </div>`;
+      }
+    } catch (e) { alert("Feil: " + e); }
+    finally { btn.disabled = false; btn.textContent = orig; }
+  });
+})();
+</script>
+{% endblock %}

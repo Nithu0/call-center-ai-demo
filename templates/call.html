@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ transcript.title }} — Loyalty AI{% endblock %}
+{% block content %}
+
+<p><a class="back" href="/">← Alle samtaler</a></p>
+
+<div class="call-header">
+  <span class="badge badge-{{ transcript.call_type }}">{{ transcript.call_type }}</span>
+  <h1>{{ transcript.title }}</h1>
+  <span class="call-header-meta">{{ transcript.turns | length }} replikker</span>
+</div>
+
+<div class="split">
+  <!-- VENSTRE: transkript -->
+  <section class="panel transcript-panel">
+    <div class="panel-head">
+      <h2>📝 Transkript</h2>
+    </div>
+    <div class="transcript">
+      {% for turn in transcript.turns %}
+      <div class="turn turn-{{ turn.speaker }}">
+        <span class="speaker">{{ turn.speaker }}</span>
+        <span class="text">{{ turn.text }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- HØYRE: AI-analyse -->
+  <section class="panel analysis-panel" id="analysis-panel"
+           data-name="{{ transcript.name }}">
+    <div class="analysis-head">
+      <h2>✨ AI-analyse</h2>
+      <button id="reanalyze-btn" class="btn">↻ Kjør analyse på nytt</button>
+    </div>
+    <div id="analysis-body" class="analysis-body-anim">
+      {% include "_analysis.html" %}
+    </div>
+  </section>
+</div>
+
+<script src="/static/app.js"></script>
+{% endblock %}

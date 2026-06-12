@@ -1,0 +1,20 @@
+{
+  "name": "kundeservice_faktura",
+  "call_type": "kundeservice",
+  "title": "Kundeservice — feil på faktura (innkommende)",
+  "turns": [
+    { "speaker": "agent", "text": "Velkommen til kundeservice, du snakker med Ingrid. Hva kan jeg hjelpe deg med i dag?" },
+    { "speaker": "kunde", "text": "Hei, jeg har fått en faktura som er mye høyere enn vanlig, og jeg skjønner ikke hvorfor." },
+    { "speaker": "agent", "text": "Det skal vi finne ut av. Kan du først bekrefte navn og fødselsdato, så jeg får hentet opp riktig kunde?" },
+    { "speaker": "kunde", "text": "Ja, Per Hansen, født tolvte mai nittenåttifem." },
+    { "speaker": "agent", "text": "Takk, da har jeg deg her. Jeg ser at fakturaen for denne måneden er på 749 kroner mot vanlig 399. La meg se på detaljene." },
+    { "speaker": "kunde", "text": "Ja, det er jo nesten det dobbelte." },
+    { "speaker": "agent", "text": "Jeg ser nå at det er lagt til et engangsgebyr for et ekstra kamera som ble installert forrige måned. Bestilte du en oppgradering?" },
+    { "speaker": "kunde", "text": "Nei, det har jeg aldri bestilt. Det må være en feil." },
+    { "speaker": "agent", "text": "Det beklager jeg. Da ser det ut som en feilføring fra vår side. Jeg krediterer engangsgebyret på 350 kroner med en gang, så ny faktura blir på 399." },
+    { "speaker": "kunde", "text": "Så bra, takk. Når ser jeg det på kontoen?" },
+    { "speaker": "agent", "text": "Krediteringen er registrert nå og du får en korrigert faktura på e-post innen to virkedager. Er det noe annet jeg kan hjelpe deg med?" },
+    { "speaker": "kunde", "text": "Nei, det var alt. Takk for rask hjelp." },
+    { "speaker": "agent", "text": "Bare hyggelig, Per. Ha en fin dag videre!" }
+  ]
+}

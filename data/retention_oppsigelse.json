@@ -1,0 +1,23 @@
+{
+  "name": "retention_oppsigelse",
+  "call_type": "kundeservice",
+  "title": "Kundeservice — kunde vil si opp, retention (innkommende)",
+  "turns": [
+    { "speaker": "agent", "text": "Velkommen til kundeservice, du snakker med Henrik. Hva kan jeg hjelpe deg med i dag?" },
+    { "speaker": "kunde", "text": "Hei. Jeg ringer for å si opp abonnementet mitt." },
+    { "speaker": "agent", "text": "Det skal vi få ordnet. Først, kan du bekrefte navn og kundenummer, så finner jeg avtalen din?" },
+    { "speaker": "kunde", "text": "Ola Nordmann, kundenummer 4-4-8-2-1." },
+    { "speaker": "agent", "text": "Takk, da har jeg deg her. Får jeg lov til å spørre hva som er grunnen til at du ønsker å si opp?" },
+    { "speaker": "kunde", "text": "Det har blitt for dyrt, rett og slett. Jeg betaler 599 i måneden og bruker det knapt." },
+    { "speaker": "agent", "text": "Det forstår jeg godt. La meg se hva jeg kan gjøre. Jeg ser at du har vært kunde hos oss i over tre år — takk for det. Jeg har faktisk mulighet til å tilby deg et lojalitetstilbud på 349 i måneden med samme innhold." },
+    { "speaker": "kunde", "text": "Hmm. 349, det er jo en god del billigere. Men jeg bruker det jo fortsatt lite." },
+    { "speaker": "agent", "text": "Det er et godt poeng. Hvis du heller vil ha et mindre abonnement, har vi også en lettpakke til 199 i måneden som dekker det mest brukte. Hva er det du bruker mest?" },
+    { "speaker": "kunde", "text": "Egentlig bare strømming og litt data. Den lettpakka høres faktisk riktig ut." },
+    { "speaker": "agent", "text": "Da anbefaler jeg lettpakka til 199. Du sparer 400 kroner i måneden mot i dag, og det er ingen bindingstid. Ønsker du at jeg bytter deg over til den?" },
+    { "speaker": "kunde", "text": "Ja, vet du hva, det gjør vi. Da slipper jeg å si opp." },
+    { "speaker": "agent", "text": "Så bra at vi fant en løsning! Jeg trenger bare ditt samtykke til endringen — bekrefter du at du vil bytte til lettpakka til 199 kroner i måneden fra neste faktura?" },
+    { "speaker": "kunde", "text": "Ja, det bekrefter jeg." },
+    { "speaker": "agent", "text": "Perfekt, det er registrert. Du får bekreftelse på e-post i dag. Takk for at du fortsetter hos oss, Ola, og ha en fin dag!" },
+    { "speaker": "kunde", "text": "Takk for hjelpen, ha det." }
+  ]
+}

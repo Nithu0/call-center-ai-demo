@@ -1,0 +1,23 @@
+{
+  "name": "salg_forsikring",
+  "call_type": "salg",
+  "title": "Salgsanrop — innboforsikring (utgående)",
+  "turns": [
+    { "speaker": "agent", "text": "Hei, du snakker med Markus fra Loyalty på vegne av Trygg Forsikring. Snakker jeg med Ola Nordmann?" },
+    { "speaker": "kunde", "text": "Ja, det stemmer." },
+    { "speaker": "agent", "text": "Flott. Jeg ringer fordi vi har en ny kampanje på innboforsikring, og jeg ville høre hvordan du er dekket i dag. Har du innboforsikring nå?" },
+    { "speaker": "kunde", "text": "Ja, jeg har en eller annen forsikring gjennom banken, tror jeg. Vet ikke helt hva den dekker." },
+    { "speaker": "agent", "text": "Det er ganske vanlig. Kan jeg stille et par korte spørsmål for å se om vi kan gi deg bedre dekning til lavere pris? Bor du i leilighet eller enebolig?" },
+    { "speaker": "kunde", "text": "Leilighet, jeg bor alene." },
+    { "speaker": "agent", "text": "Og har du en omtrentlig verdi på innboet ditt — møbler, elektronikk, klær og sånt?" },
+    { "speaker": "kunde", "text": "Nei, jeg har egentlig aldri tenkt på det. Kanskje to-tre hundre tusen?" },
+    { "speaker": "agent", "text": "Da passer vår Standard-pakke fint. Den dekker innbo opptil 500 000 kroner, inkludert tyveri, brann og vannskade, og koster 159 kroner i måneden. Du får også uhellsforsikring på mobil og PC inkludert." },
+    { "speaker": "kunde", "text": "159 i måneden? Det høres rimelig ut. Hva betaler jeg i egenandel hvis noe skjer?" },
+    { "speaker": "agent", "text": "Egenandelen er 3 000 kroner per skade. Og det er ingen bindingstid — du kan si opp når som helst med én måneds varsel." },
+    { "speaker": "kunde", "text": "Greit. Jeg tror jeg vil bytte, ja." },
+    { "speaker": "agent", "text": "Så bra! For å opprette avtalen trenger jeg ditt samtykke til at vi registrerer forsikringen og sender vilkårene på e-post. Bekrefter du at du ønsker å tegne Standard innboforsikring til 159 kroner i måneden?" },
+    { "speaker": "kunde", "text": "Ja, det bekrefter jeg." },
+    { "speaker": "agent", "text": "Perfekt. Da er du dekket fra og med i morgen. Du får vilkår og angrerett på e-post i dag. Takk for praten, Ola, ha en fin dag!" },
+    { "speaker": "kunde", "text": "Takk, i like måte." }
+  ]
+}

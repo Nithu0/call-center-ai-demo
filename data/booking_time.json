@@ -1,0 +1,22 @@
+{
+  "name": "booking_time",
+  "call_type": "kundeservice",
+  "title": "Kundeservice — møtebooking og timeavtale (innkommende)",
+  "turns": [
+    { "speaker": "agent", "text": "Velkommen til Loyalty booking, du snakker med Sara. Hva kan jeg hjelpe deg med?" },
+    { "speaker": "kunde", "text": "Hei, jeg skulle gjerne booket en time for en gjennomgang av strømavtalen min." },
+    { "speaker": "agent", "text": "Det ordner vi. Kan du bekrefte navnet ditt, så finner jeg deg i systemet?" },
+    { "speaker": "kunde", "text": "Ola Nordmann." },
+    { "speaker": "agent", "text": "Takk, Ola. En slik gjennomgang tar normalt rundt 30 minutter og kan tas på telefon eller video. Hva passer best for deg?" },
+    { "speaker": "kunde", "text": "Telefon holder fint." },
+    { "speaker": "agent", "text": "Flott. Jeg har ledige tider denne uka — onsdag klokka 10, torsdag klokka 14, eller fredag klokka 9. Hva passer?" },
+    { "speaker": "kunde", "text": "Torsdag klokka 14 passer bra." },
+    { "speaker": "agent", "text": "Da setter jeg deg opp torsdag klokka 14. Hvilket telefonnummer skal rådgiveren ringe deg på?" },
+    { "speaker": "kunde", "text": "Det samme som jeg ringer fra nå." },
+    { "speaker": "agent", "text": "Notert, vi bruker det nummeret du ringer fra. Du får en bekreftelse på SMS med mulighet for å endre eller avbestille hvis det skulle dukke opp noe." },
+    { "speaker": "kunde", "text": "Supert. Er det noe jeg bør ha klart til samtalen?" },
+    { "speaker": "agent", "text": "Det er fint om du har siste strømfaktura tilgjengelig, så kan rådgiveren se på forbruket ditt. Ellers trenger du ikke forberede noe." },
+    { "speaker": "kunde", "text": "Greit, da har jeg den klar. Takk!" },
+    { "speaker": "agent", "text": "Bare hyggelig, Ola. Da er du booket torsdag klokka 14. Ha en fin dag!" }
+  ]
+}

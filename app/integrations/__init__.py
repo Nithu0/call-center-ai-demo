@@ -1,0 +1,1 @@
+"""Integrasjons-stubs (CRM, telefoni)."""

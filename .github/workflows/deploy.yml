@@ -1,0 +1,117 @@
+# =====================================================================
+#  CI/CD — bygg Docker-image og deploy til Azure Container Apps
+# =====================================================================
+#  Beviser at SAMME image som kjører lokalt (DEPLOY_TARGET=local) deployes
+#  til Azure (DEPLOY_TARGET=azure, satt av Bicep). Workflowen:
+#    1. Logger inn på Azure
+#    2. Bygger imaget i Azure Container Registry (az acr build — ingen
+#       lokal Docker-runner nødvendig)
+#    3. Oppdaterer Container-appen til den nye image-taggen
+#
+#  --------------------------------------------------------------------
+#  SECRETS som må settes i repoet (Settings -> Secrets and variables ->
+#  Actions -> New repository secret):
+#
+#    AZURE_CREDENTIALS   JSON fra en service principal med Contributor på
+#                        resource group. Lag den slik (engangs, lokalt):
+#
+#        az ad sp create-for-rbac \
+#          --name "loyalty-callcenter-ci" \
+#          --role contributor \
+#          --scopes /subscriptions/<SUB_ID>/resourceGroups/loyalty-callcenter-rg \
+#          --sdk-auth
+#
+#      Lim HELE JSON-outputen inn som verdien til AZURE_CREDENTIALS.
+#
+#  VARIABLES (Settings -> Secrets and variables -> Actions -> Variables),
+#  eller endre defaultene under:
+#
+#    AZURE_RESOURCE_GROUP   default: loyalty-callcenter-rg
+#    AZURE_CONTAINERAPP     default: loyaltycc-app
+#    ACR_NAME               ACR-navnet fra Bicep-output (acrName).
+#
+#  Forutsetning: infrastrukturen (main.bicep) er allerede provisjonert én
+#  gang manuelt via azure/deploy.md. Denne workflowen bygger + ruller ut
+#  NYE imager; den oppretter ikke infra på nytt.
+# =====================================================================
+
+name: Deploy to Azure Container Apps
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:        # tillat manuell kjøring fra Actions-fanen
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_NAME: call-center-ai
+  # Endre disse her, eller overstyr via repo-variabler (vars.*):
+  RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP || 'loyalty-callcenter-rg' }}
+  CONTAINERAPP_NAME: ${{ vars.AZURE_CONTAINERAPP || 'loyaltycc-app' }}
+  ACR_NAME: ${{ vars.ACR_NAME }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validér påkrevde innstillinger
+        run: |
+          if [ -z "${ACR_NAME}" ]; then
+            echo "::error::Repo-variabelen ACR_NAME mangler. Sett den til ACR-navnet fra Bicep-output (acrName)."
+            exit 1
+          fi
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Bygg imaget i ACR. Tagg med commit-SHA (sporbarhet) + latest.
+      - name: Build image in ACR
+        run: |
+          az acr build \
+            --registry "${ACR_NAME}" \
+            --image "${IMAGE_NAME}:${GITHUB_SHA}" \
+            --image "${IMAGE_NAME}:latest" \
+            .
+
+      # Rull ut den nye image-taggen til Container-appen. Env/secrets
+      # (DEPLOY_TARGET=azure, Azure-nøkler) er allerede satt av Bicep.
+      - name: Deploy to Container Apps
+        run: |
+          LOGIN_SERVER=$(az acr show --name "${ACR_NAME}" --query loginServer -o tsv)
+          az containerapp update \
+            --name "${CONTAINERAPP_NAME}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --image "${LOGIN_SERVER}/${IMAGE_NAME}:${GITHUB_SHA}"
+
+      # Røyktest: /healthz skal returnere status:ok + deploy_target:azure.
+      - name: Smoke test /healthz
+        run: |
+          FQDN=$(az containerapp show \
+            --name "${CONTAINERAPP_NAME}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query properties.configuration.ingress.fqdn -o tsv)
+          echo "App: https://${FQDN}"
+          # Gi den nye revisjonen litt tid på å bli frisk:
+          for i in $(seq 1 10); do
+            if curl -fsS "https://${FQDN}/healthz" | tee /tmp/health.json; then
+              break
+            fi
+            echo "Venter på at appen blir frisk... (forsøk $i)"
+            sleep 15
+          done
+          grep -q '"status": *"ok"' /tmp/health.json
+          grep -q '"deploy_target": *"azure"' /tmp/health.json
+
+      - name: Azure logout
+        if: always()
+        run: az logout || true

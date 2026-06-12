@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Loyalty AI — Call-senter{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  {% set b = banner %}
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">◆</span>
+        <span class="brand-name">Loyalty&nbsp;AI</span>
+        <span class="brand-sub">Call-senter</span>
+      </a>
+
+      <nav class="nav">
+        <a class="nav-link {{ 'is-active' if request.url.path == '/' else '' }}" href="/">
+          <span class="nav-ico">🏠</span> Forside
+        </a>
+        <a class="nav-link {{ 'is-active' if request.url.path.startswith('/live') else '' }}" href="/live">
+          <span class="nav-ico">🎙️</span> Live
+        </a>
+        <a class="nav-link {{ 'is-active' if request.url.path.startswith('/dashboard') else '' }}" href="/dashboard">
+          <span class="nav-ico">📊</span> Dashboard
+        </a>
+        <a class="nav-link {{ 'is-active' if request.url.path.startswith('/eval') else '' }}" href="/eval">
+          <span class="nav-ico">⚡</span> Effekt
+        </a>
+      </nav>
+
+      <div class="deploy-chip {{ 'is-azure' if b.is_azure else 'is-local' }}"
+           title="DEPLOY_TARGET={{ b.deploy_target | upper }} — samme kode, bytt 2 env-variabler">
+        <span class="deploy-dot"></span>
+        <span class="deploy-where">{{ 'Azure' if b.is_azure else 'Lokalt' }}</span>
+        <span class="deploy-target">{{ b.deploy_target | upper }}</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="provider-banner {{ 'is-azure' if b.is_azure else 'is-local' }}">
+    <div class="provider-inner">
+      <div class="banner-row">
+        <span class="pill pill-target">DEPLOY_TARGET = <strong>{{ b.deploy_target | upper }}</strong></span>
+        <span class="pill"><span class="pill-key">STT</span> <strong>{{ b.stt_backend }}</strong></span>
+        <span class="pill"><span class="pill-key">LLM</span> <strong>{{ b.llm_backend }}</strong></span>
+      </div>
+      <div class="banner-thesis">
+        Samme kode — bytt 2 env-variabler (<code>DEPLOY_TARGET=azure</code>) → kjører på Azure
+      </div>
+    </div>
+  </div>
+
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <span>Loyalty AI · call-senter-demo</span>
+    <span class="footer-note">Demo — ingen auth/PII-maskering. Se README «produksjon» for hvor sikkerhet hører hjemme.</span>
+  </footer>
+</body>
+</html>

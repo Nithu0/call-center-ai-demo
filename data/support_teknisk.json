@@ -1,0 +1,22 @@
+{
+  "name": "support_teknisk",
+  "call_type": "kundeservice",
+  "title": "Kundeservice — teknisk support, ruter (innkommende)",
+  "turns": [
+    { "speaker": "agent", "text": "Teknisk support, du snakker med Jonas. Hva kan jeg hjelpe deg med?" },
+    { "speaker": "kunde", "text": "Hei. Jeg får ikke koblet meg på wifi i det hele tatt. Ruteren blinker rødt." },
+    { "speaker": "agent", "text": "Det skal vi se på sammen. Kan du først bekrefte navn og adresse, så henter jeg opp linjen din?" },
+    { "speaker": "kunde", "text": "Ola Nordmann, Lillevegen 3 i Trondheim." },
+    { "speaker": "agent", "text": "Takk, da har jeg deg. Jeg ser at linjen din er aktiv fra vår side, så feilen ligger nok lokalt. Et rødt lys betyr som regel at ruteren mangler signal. Kan du sjekke at fiberkabelen sitter godt i?" },
+    { "speaker": "kunde", "text": "Ja, vent litt … den satt litt løs faktisk. Nå trykket jeg den inn." },
+    { "speaker": "agent", "text": "Bra. La oss gjøre en omstart for å være sikre. Kan du trekke ut strømmen til ruteren, vente i omtrent 30 sekunder, og så koble den til igjen?" },
+    { "speaker": "kunde", "text": "Ok, nå har jeg trukket den ut … og nå er den på igjen. Lyset er gult nå." },
+    { "speaker": "agent", "text": "Gult betyr at den starter opp. Det tar gjerne et par minutter før den blir grønn. Mens vi venter — bruker du 2,4 eller 5 gigahertz-nettet?" },
+    { "speaker": "kunde", "text": "Jeg aner ikke, jeg kobler bare på det vanlige. Nå ble lyset grønt!" },
+    { "speaker": "agent", "text": "Perfekt, da er signalet tilbake. Prøv å koble telefonen på wifi nå og si fra om det fungerer." },
+    { "speaker": "kunde", "text": "Ja! Nå er jeg på nett igjen. Det var jo enkelt." },
+    { "speaker": "agent", "text": "Så bra! Problemet var den løse kabelen. Hvis det rødt lyset kommer tilbake, sjekk kabelen først og ta en omstart. Skal jeg sende deg en kort guide på SMS?" },
+    { "speaker": "kunde", "text": "Ja, det hadde vært fint. Takk for hjelpen!" },
+    { "speaker": "agent", "text": "Bare hyggelig, Ola. Guiden kommer på SMS nå. Ha en fin dag!" }
+  ]
+}

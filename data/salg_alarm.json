@@ -1,0 +1,21 @@
+{
+  "name": "salg_alarm",
+  "call_type": "salg",
+  "title": "Salgsanrop — alarm og forsikring (utgående)",
+  "turns": [
+    { "speaker": "agent", "text": "Hei, du snakker med Sondre fra TryggHjem Sikkerhet. Snakker jeg med Kari Nordmann?" },
+    { "speaker": "kunde", "text": "Ja, det er meg." },
+    { "speaker": "agent", "text": "Så bra. Grunnen til at jeg ringer er at vi har en kampanje på boligalarm i ditt nabolag. Har du noen form for alarm i dag?" },
+    { "speaker": "kunde", "text": "Nei, vi har faktisk ikke det. Vi har snakket om det lenge, men aldri kommet i gang." },
+    { "speaker": "agent", "text": "Det er mange som har det sånn. Får jeg lov til å stille noen korte spørsmål for å se hva som passer? Bor dere i enebolig eller leilighet?" },
+    { "speaker": "kunde", "text": "Enebolig, vi er fire i husstanden." },
+    { "speaker": "agent", "text": "Da vil jeg anbefale vår Komplett-pakke med innbruddsalarm, røykvarsler og kameraovervåking. Den koster 399 kroner i måneden, og installasjonen er gratis nå i kampanjeperioden." },
+    { "speaker": "kunde", "text": "399 i måneden, ja. Er det binding på det?" },
+    { "speaker": "agent", "text": "Det er 12 måneders bindingstid, og deretter løpende med én måneds oppsigelse. Mange kunder får også rabatt på husforsikringen, ofte rundt 15 prosent, fordi alarm reduserer risiko." },
+    { "speaker": "kunde", "text": "Det hørtes greit ut. Men jeg må diskutere med mannen min først." },
+    { "speaker": "agent", "text": "Helt forståelig. Skal vi avtale at jeg ringer deg tilbake på torsdag klokka 18, så har du fått snakket med ham?" },
+    { "speaker": "kunde", "text": "Ja, det passer fint." },
+    { "speaker": "agent", "text": "Supert, da noterer jeg det. Jeg sender deg en e-post med tilbudet skriftlig i mellomtiden. Takk for praten, Kari, ha en fin dag!" },
+    { "speaker": "kunde", "text": "Takk, i like måte." }
+  ]
+}

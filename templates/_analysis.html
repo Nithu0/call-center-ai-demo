@@ -1,0 +1,99 @@
+{# Analyse-fragment — gjenbrukes ved første render og ved "kjør på nytt" #}
+<p class="backend-note">Analysert av backend: <code>{{ analysis.backend }}</code></p>
+
+<div class="a-block">
+  <h3>Sammendrag</h3>
+  <p class="summary">{{ analysis.summary }}</p>
+</div>
+
+<div class="a-block badge-row">
+  <div class="mini">
+    <span class="mini-label">Sentiment</span>
+    <span class="sentiment sentiment-{{ analysis.sentiment }}">{{ analysis.sentiment }}</span>
+  </div>
+  {% if analysis.churn_risk %}
+  <div class="mini">
+    <span class="mini-label">Churn-risiko</span>
+    <span class="churn churn-{{ analysis.churn_risk }}">{{ analysis.churn_risk }}</span>
+  </div>
+  {% endif %}
+  {% if analysis.call_reason %}
+  <div class="mini">
+    <span class="mini-label">Henvendelsesårsak</span>
+    <span class="reason-chip">{{ analysis.call_reason }}</span>
+  </div>
+  {% endif %}
+</div>
+
+<div class="a-block">
+  <h3>QA-scorecard
+    <span class="score-total score-{{ 'good' if analysis.scorecard.percent >= 80 else ('mid' if analysis.scorecard.percent >= 50 else 'bad') }}">
+      {{ analysis.scorecard.total }}/{{ analysis.scorecard.max_score }} ({{ analysis.scorecard.percent }}%)
+    </span>
+  </h3>
+  <div class="score-bar">
+    <div class="score-bar-fill fill-{{ 'good' if analysis.scorecard.percent >= 80 else ('mid' if analysis.scorecard.percent >= 50 else 'bad') }}"
+         style="width: {{ analysis.scorecard.percent }}%"></div>
+  </div>
+  <ul class="scorecard">
+    {% for item in analysis.scorecard.items %}
+    <li class="sc-item sc-{{ 'pass' if item.score == 1 else 'fail' }}">
+      <span class="sc-mark">{{ '✓' if item.score == 1 else '✗' }}</span>
+      <span class="sc-label">{{ item.label }}</span>
+      <span class="sc-ev">{{ item.evidence }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% if analysis.script_adherence %}
+<div class="a-block">
+  <h3>Manus-etterlevelse</h3>
+  <div class="score-bar">
+    <div class="score-bar-fill fill-{{ 'good' if analysis.script_adherence >= 80 else ('mid' if analysis.script_adherence >= 50 else 'bad') }}"
+         style="width: {{ analysis.script_adherence }}%"></div>
+  </div>
+  <span class="adherence-val">{{ analysis.script_adherence }}%</span>
+</div>
+{% endif %}
+
+<div class="a-block">
+  <h3>Nøkkelinfo</h3>
+  <table class="kv">
+    <tr><th>Intensjon</th><td>{{ analysis.key_info.intent or "—" }}</td></tr>
+    <tr><th>Produkt/tjeneste</th><td>{{ analysis.key_info.product or "—" }}</td></tr>
+    <tr><th>Utfall</th><td>{{ analysis.key_info.outcome or "—" }}</td></tr>
+    <tr><th>Neste steg</th><td>{{ analysis.key_info.next_step or "—" }}</td></tr>
+  </table>
+</div>
+
+<div class="a-block">
+  <h3>Compliance-flagg</h3>
+  {% if analysis.compliance_flags %}
+  <ul class="flags">
+    {% for f in analysis.compliance_flags %}<li class="flag">⚠ {{ f }}</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p class="ok">✓ Ingen flagg.</p>
+  {% endif %}
+</div>
+
+{% if analysis.coaching_tips %}
+<div class="a-block">
+  <h3>Coaching til agenten</h3>
+  <ul class="coaching">
+    {% for tip in analysis.coaching_tips %}<li>💡 {{ tip }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<div class="a-block">
+  <h3>Foreslått oppfølging</h3>
+  {% if analysis.follow_up %}
+  <ul class="follow-up">
+    {% for a in analysis.follow_up %}<li>{{ a }}</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p>—</p>
+  {% endif %}
+</div>

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}Ledelses-dashboard — Call-senter AI-demo{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/dashboard.css" />
+
+<p><a class="back" href="/">&larr; Alle samtaler</a></p>
+<h1>Ledelses-dashboard <span class="dash-sub">· Voice of Customer</span></h1>
+<p class="lead">
+  AI-analyse kjørt på alle {{ total_calls }} samtaler. Aggregert QA, sentiment,
+  henvendelsesårsak, churn-risiko og compliance — det ledelsen i Loyalty følger.
+</p>
+
+<!-- KPI-kort -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Snitt QA-score</div>
+    <div class="kpi-value">{{ avg_qa }}<span class="kpi-unit">%</span></div>
+    <div class="kpi-bar"><span style="width: {{ avg_qa }}%"></span></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Analyserte samtaler</div>
+    <div class="kpi-value">{{ total_calls }}</div>
+    <div class="kpi-foot">hele porteføljen</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Høy churn-risiko</div>
+    <div class="kpi-value kpi-danger">{{ high_churn_calls | length }}</div>
+    <div class="kpi-foot">samtaler krever oppfølging</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Compliance-flagg</div>
+    <div class="kpi-value {{ 'kpi-warn' if total_flags else '' }}">{{ total_flags }}</div>
+    <div class="kpi-foot">på tvers av samtaler</div>
+  </div>
+</div>
+
+<div class="dash-grid">
+  <!-- QA-score per samtale (søylegraf) -->
+  <section class="panel">
+    <h2>QA-score per samtale</h2>
+    <div class="bars">
+      {% for r in rows %}
+      <div class="bar-row">
+        <a class="bar-name" href="/call/{{ r.name }}" title="{{ r.title }}">{{ r.title }}</a>
+        <div class="bar-track">
+          <span class="bar-fill {{ 'bar-good' if r.qa_percent >= 80 else ('bar-mid' if r.qa_percent >= 50 else 'bar-bad') }}"
+                style="width: {{ r.qa_percent }}%"></span>
+        </div>
+        <span class="bar-val">{{ r.qa_percent }}%</span>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="bar-legend">
+      <span><i class="dot dot-good"></i>≥80%</span>
+      <span><i class="dot dot-mid"></i>50–79%</span>
+      <span><i class="dot dot-bad"></i>&lt;50%</span>
+    </div>
+  </section>
+
+  <!-- Sentiment-fordeling -->
+  <section class="panel">
+    <h2>Sentiment-fordeling</h2>
+    <div class="dist">
+      {% for s in sentiment_dist %}
+      <div class="dist-row">
+        <span class="dist-label">
+          <span class="sentiment sentiment-{{ s.label }}">{{ s.label }}</span>
+        </span>
+        <div class="dist-track">
+          <span class="dist-fill sent-fill-{{ s.label }}" style="width: {{ s.percent }}%"></span>
+        </div>
+        <span class="dist-val">{{ s.count }} <small>({{ s.percent }}%)</small></span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Henvendelsesårsak -->
+  <section class="panel">
+    <h2>Henvendelsesårsak</h2>
+    {% if reason_dist %}
+    <div class="dist">
+      {% for rsn in reason_dist %}
+      <div class="dist-row">
+        <span class="dist-label reason-label">{{ rsn.label }}</span>
+        <div class="dist-track">
+          <span class="dist-fill reason-fill" style="width: {{ rsn.percent }}%"></span>
+        </div>
+        <span class="dist-val">{{ rsn.count }} <small>({{ rsn.percent }}%)</small></span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="muted">Ingen årsaker klassifisert.</p>
+    {% endif %}
+  </section>
+
+  <!-- Churn-risiko -->
+  <section class="panel">
+    <h2>Churn-risiko</h2>
+    <div class="churn-chips">
+      {% for c in churn_dist %}
+      <div class="churn-chip churn-{{ c.label }}">
+        <span class="churn-count">{{ c.count }}</span>
+        <span class="churn-name">{{ c.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% if high_churn_calls %}
+    <p class="churn-alert-head">Høy risiko — følg opp:</p>
+    <ul class="churn-list">
+      {% for r in high_churn_calls %}
+      <li><a href="/call/{{ r.name }}">{{ r.title }}</a> <small>· {{ r.call_reason }}</small></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="ok">Ingen samtaler med høy churn-risiko.</p>
+    {% endif %}
+  </section>
+
+  <!-- Topp compliance-flagg -->
+  <section class="panel">
+    <h2>Topp compliance-flagg</h2>
+    {% if top_flags %}
+    <ul class="flag-rank">
+      {% for f in top_flags %}
+      <li>
+        <span class="flag-count">{{ f.count }}×</span>
+        <span class="flag-text">{{ f.label }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="ok">Ingen compliance-flagg på tvers av porteføljen.</p>
+    {% endif %}
+  </section>
+</div>
+
+<!-- Agent/samtale-tabell -->
+<section class="panel panel-wide">
+  <h2>Samtale-oversikt</h2>
+  <div class="table-wrap">
+    <table class="dash-table">
+      <thead>
+        <tr>
+          <th>Samtale</th>
+          <th>Type</th>
+          <th>Årsak</th>
+          <th class="num">QA</th>
+          <th>Sentiment</th>
+          <th>Churn</th>
+          <th class="num">Flagg</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td class="td-title">{{ r.title }}</td>
+          <td><span class="badge badge-{{ r.call_type }}">{{ r.call_type }}</span></td>
+          <td class="td-reason">{{ r.call_reason }}</td>
+          <td class="num">
+            <span class="qa-pill {{ 'qa-good' if r.qa_percent >= 80 else ('qa-mid' if r.qa_percent >= 50 else 'qa-bad') }}">{{ r.qa_percent }}%</span>
+          </td>
+          <td><span class="sentiment sentiment-{{ r.sentiment }}">{{ r.sentiment }}</span></td>
+          <td><span class="churn-tag churn-{{ r.churn_risk }}">{{ r.churn_risk }}</span></td>
+          <td class="num">{{ r.flag_count }}</td>
+          <td><a class="row-link" href="/call/{{ r.name }}">åpne →</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

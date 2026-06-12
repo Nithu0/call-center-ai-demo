@@ -1,0 +1,34 @@
+# Python virtualenv + bytecode
+.venv/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Test- og verktøy-cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Hemmeligheter — skal ALDRI inn i imaget
+.env
+.env.*
+!.env.example
+
+# Audio-data og store binær-bilag (mock-demoen bruker JSON-transkript, ikke lyd)
+data/audio/
+
+# Git + IDE
+.git/
+.gitignore
+.github/
+.vscode/
+.idea/
+
+# Deploy-artefakter (ikke nødvendig inne i imaget)
+azure/
+Dockerfile
+.dockerignore
+
+# Dokumentasjon
+*.md
+docs/

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Samtaler — Loyalty AI{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="hero-text">
+    <span class="eyebrow">AI for call-senter</span>
+    <h1>Hver samtale, automatisk analysert</h1>
+    <p class="lead">
+      Transkripsjon, sammendrag, sentiment, QA-scorecard, nøkkelinfo, compliance-flagg
+      og foreslått oppfølging — for hver eneste samtale, ikke bare stikkprøver.
+    </p>
+    <div class="hero-stats">
+      <div class="stat"><strong>{{ samples | length }}</strong><span>demo-samtaler</span></div>
+      <div class="stat"><strong>100%</strong><span>dekning</span></div>
+      <div class="stat"><strong>~2&nbsp;env</strong><span>til Azure</span></div>
+    </div>
+
+    <a class="call-card hero-cta" href="/live">
+      <span class="badge badge-live">🎙️ Live</span>
+      <span class="call-body">
+        <span class="call-title">Snakk inn en samtale → se AI-en transkribere og analysere live</span>
+        <span class="call-meta">Sanntid tale-til-tekst + AI-analyse</span>
+      </span>
+      <span class="call-go" aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>
+
+<div class="section-head">
+  <h2>Velg en samtale</h2>
+  <p class="muted">Klikk for transkript + full AI-analyse.</p>
+</div>
+
+<ul class="call-list">
+  {% for s in samples %}
+  <li class="call-card" style="--i: {{ loop.index0 }}">
+    <a href="/call/{{ s.name }}">
+      <span class="badge badge-{{ s.call_type }}">{{ s.call_type }}</span>
+      <span class="call-body">
+        <span class="call-title">{{ s.title or s.name }}</span>
+        <span class="call-meta">{{ s.turns | length }} replikker</span>
+      </span>
+      <span class="call-go" aria-hidden="true">→</span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,23 @@
+{
+  "name": "inkasso_betaling",
+  "call_type": "kundeservice",
+  "title": "Kundeservice — betalingsoppfølging og inkasso (utgående, sensitivt)",
+  "turns": [
+    { "speaker": "agent", "text": "Hei, du snakker med Camilla fra Loyalty Inkasso på vegne av Trygg Forsikring. Snakker jeg med Ola Nordmann?" },
+    { "speaker": "kunde", "text": "Ja, det er meg. Hva gjelder det?" },
+    { "speaker": "agent", "text": "Av sikkerhetshensyn må jeg bekrefte identiteten din først. Kan du oppgi fødselsnummeret ditt?" },
+    { "speaker": "kunde", "text": "Ja, det er 010190 12345." },
+    { "speaker": "agent", "text": "Takk, da har jeg bekreftet deg. Jeg ringer fordi vi har en ubetalt faktura på 1 248 kroner med forfall 15. mai, som nå har gått til inkassovarsel." },
+    { "speaker": "kunde", "text": "Oi. Den har jeg faktisk ikke sett. Jeg byttet e-postadresse i vår." },
+    { "speaker": "agent", "text": "Det kan forklare det. Da skal vi få oppdatert e-posten din også. Det viktigste nå er at vi finner en løsning før saken går videre, slik at du slipper ekstra gebyrer. Har du mulighet til å betale hele beløpet nå?" },
+    { "speaker": "kunde", "text": "Akkurat nå er det litt stramt. Kan jeg dele det opp?" },
+    { "speaker": "agent", "text": "Det får vi til. Jeg kan sette opp en betalingsavtale på to terminer: 624 kroner nå innen ti dager, og resten innen 30 dager. Da stopper vi inkassoprosessen. Passer det?" },
+    { "speaker": "kunde", "text": "Ja, det går fint. Da betaler jeg den første nå i nettbanken." },
+    { "speaker": "agent", "text": "Flott. For å opprette avtalen trenger jeg ditt samtykke. Bekrefter du betalingsavtalen på to terminer, der inkassoprosessen settes på vent så lenge avtalen følges?" },
+    { "speaker": "kunde", "text": "Ja, det bekrefter jeg." },
+    { "speaker": "agent", "text": "Takk. Jeg oppdaterer e-postadressen din også — hva er den nye?" },
+    { "speaker": "kunde", "text": "ola.nordmann@example.no." },
+    { "speaker": "agent", "text": "Notert. Du får betalingsavtalen og KID-nummer på den nye e-posten i dag. Takk for at vi fant en løsning, Ola. Ha en fin dag." },
+    { "speaker": "kunde", "text": "Takk, ha det." }
+  ]
+}

@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+
+# Data/artefakter
+data/audio/*.wav
+data/audio/*.mp3
+data/audio/*.m4a
+.pytest_cache/
+dist/
+*.local
+.env.local
+.DS_Store

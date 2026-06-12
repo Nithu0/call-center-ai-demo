@@ -1,0 +1,22 @@
+{
+  "name": "kundeservice_klage",
+  "call_type": "kundeservice",
+  "title": "Kundeservice — misfornøyd kunde, klage (innkommende)",
+  "turns": [
+    { "speaker": "agent", "text": "Velkommen til kundeservice, du snakker med Thea. Hva kan jeg hjelpe deg med?" },
+    { "speaker": "kunde", "text": "Ja, nå er jeg ganske oppgitt. Dette er tredje gang jeg ringer om det samme problemet, og ingen har fikset det." },
+    { "speaker": "agent", "text": "Det forstår jeg godt at er frustrerende. Jeg beklager at det ikke er løst. Kan du fortelle meg hva problemet gjelder, så skal jeg ta tak i det nå?" },
+    { "speaker": "kunde", "text": "Internett-tilkoblingen min faller ut flere ganger om dagen. Jeg jobber hjemmefra, så det går utover jobben min." },
+    { "speaker": "agent", "text": "Det er en alvorlig sak. Kan du bekrefte navnet og adressen din, så henter jeg opp saken din?" },
+    { "speaker": "kunde", "text": "Kari Olsen, Storgata 14 i Bergen." },
+    { "speaker": "agent", "text": "Takk. Jeg ser de to tidligere henvendelsene dine her, og jeg ser at de ble lukket uten at en tekniker var ute hos deg. Det er ikke godt nok, og det beklager jeg." },
+    { "speaker": "kunde", "text": "Nei, det er det virkelig ikke. Jeg vurderer å bytte leverandør." },
+    { "speaker": "agent", "text": "Det skjønner jeg. La meg gjøre dette skikkelig nå: Jeg bestiller en tekniker hjem til deg, og jeg ser at vi har ledig time allerede i morgen mellom klokka 8 og 12. Passer det?" },
+    { "speaker": "kunde", "text": "Ja, det passer. Men jeg vil ikke betale for de ukene tjenesten ikke har fungert." },
+    { "speaker": "agent", "text": "Det er helt rimelig. Jeg krediterer deg for de siste tre ukene, og jeg registrerer en klage internt slik at saken følges opp av en leder. Du får et saksnummer på SMS." },
+    { "speaker": "kunde", "text": "Ok, det setter jeg pris på. Takk for at du faktisk tok tak i det." },
+    { "speaker": "agent", "text": "Selvsagt, det er det minste jeg kan gjøre. Du får bekreftelse på teknikerbesøk og kreditering på SMS i dag. Er det noe mer jeg kan hjelpe deg med?" },
+    { "speaker": "kunde", "text": "Nei, det var alt. Takk." },
+    { "speaker": "agent", "text": "Bare hyggelig, Kari. Beklager nok en gang bryderiet, og ha en fin dag." }
+  ]
+}
