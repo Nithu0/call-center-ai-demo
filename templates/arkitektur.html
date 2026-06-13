@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  .ark { max-width: 920px; }
+  .ark-intro { color: var(--muted); margin-bottom: 18px; }
+  .honest { border: 1px solid rgba(251,191,36,.4); background: rgba(251,191,36,.08);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 22px; }
+  .honest b { color: var(--ink); }
+  .rek { border: 1px solid rgba(52,211,153,.4); background: rgba(52,211,153,.08);
+    border-radius: 10px; padding: 14px 16px; margin: 22px 0; }
+  .ledd { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 14px; background: var(--panel); }
+  .ledd-h { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+  .ledd-n { background: var(--brand-tint, rgba(45,212,191,.15)); color: var(--ink); border: 1px solid var(--brand);
+    border-radius: 6px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; flex: none; }
+  .ledd-t { font-weight: 600; font-size: 1.08em; }
+  .ledd-meta { color: var(--muted); font-size: .9em; margin: 4px 0; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+  @media (max-width: 720px) { .two { grid-template-columns: 1fr; } }
+  .opt { border-radius: 8px; padding: 10px 12px; font-size: .9em; }
+  .opt.easy { background: rgba(52,211,153,.08); border: 1px solid rgba(52,211,153,.3); }
+  .opt.hard { background: rgba(148,163,184,.08); border: 1px solid var(--line); }
+  .opt b { display: block; margin-bottom: 3px; }
+  .flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 18px; font-size: .9em; }
+  .flow span.box { border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px; background: var(--panel); }
+  .flow span.arr { color: var(--brand); }
+</style>
+
+<div class="ark">
+  <h1>Slik henger systemet sammen — ledd for ledd</h1>
+  <p class="ark-intro">Ærlig gjennomgang av hva som faktisk skjer fra en samtale tas opp til innsikten lander
+  hos en saksbehandler. Ingenting er skjult: hvert ledd kjører <b>et sted</b> og <b>krever noe</b>.</p>
+
+  <div class="honest">
+    ⚠️ <b>Dette er ikke plug-and-play.</b> Et "ferdig produkt" er egentlig en <b>kjede av integrasjoner</b>:
+    lyden må hentes ut av telefonisystemet, transkriberes, analyseres, lagres og kobles tilbake til kundens
+    systemer. Hvert ledd kan kjøres i sky (enkelt, fast kostnad) eller selvhostet (kompleks, men full kontroll).
+    Det tar tid å forstå hvordan delene snakker sammen — derfor denne siden.
+  </div>
+
+  <div class="rek">
+    ✅ <b>Ærlig anbefaling for å komme i gang:</b> <b>start i sky (Azure, EU-region).</b> Forutsigbar månedlig
+    kostnad, ingen egen hardware/drift, raskest til pilot, og trygt nok for sensitive data (EU + databehandleravtale).
+    <b>Selvhostet NB-Whisper er en SENERE optimalisering</b> — den kutter per-minutt-kostnad ved stort volum og gir
+    maks personvern, <b>men da må dere drifte en modell-server (GPU, oppdatering, oppetid)</b>. Ikke start der.
+  </div>
+
+  <div class="flow">
+    <span class="box">📞 Opptak</span><span class="arr">→</span>
+    <span class="box">🎙️ STT</span><span class="arr">→</span>
+    <span class="box">🧠 Analyse</span><span class="arr">→</span>
+    <span class="box">💾 Lagring</span><span class="arr">→</span>
+    <span class="box">📊 Dashboard</span><span class="arr">→</span>
+    <span class="box">🔁 CRM</span>
+  </div>
+
+  <div class="ledd">
+    <div class="ledd-h"><span class="ledd-n">1</span><span class="ledd-t">📞 Telefoni / opptak — hvor lyden kommer fra</span></div>
+    <div class="ledd-meta"><b>Kjører hos:</b> telefonileverandøren (Loyalty bruker f.eks. Puzzel eller Genesys).</div>
+    <div class="ledd-meta"><b>Krav:</b> tilgang til deres API / webhook / opptakslager for å HENTE UT lyden.</div>
+    <p>Samtalene skjer i Loyaltys contact-center-plattform. Lyden må hentes ut derfra før vi kan gjøre noe.
+    <b>Dette er ofte den vanskeligste delen</b> — den avhenger helt av hvilken plattform de bruker, og må avklares
+    med Loyalty/leverandøren. Det er ikke noe vi styrer alene.</p>
+  </div>
+
+  <div class="ledd">
+    <div class="ledd-h"><span class="ledd-n">2</span><span class="ledd-t">🎙️ STT — tale blir til tekst</span></div>
+    <div class="ledd-meta">Lyden transkriberes, helst med taler-separasjon (hvem er agent, hvem er kunde).</div>
+    <div class="two">
+      <div class="opt easy"><b>Sky (enkelt) — Azure AI Speech</b>
+        Send lyd til et API → få tekst. Krav: Azure-konto + nøkkel. ~1 kr/lydtime (forutsigbar opex). EU-region. Oppe på minutter.</div>
+      <div class="opt hard"><b>Selvhostet (komplekst) — NB-Whisper</b>
+        Du KJØRER modellen selv. Krav: server med <b>GPU</b> (8–24 GB VRAM for fart; CPU tar ~1,5 min på en kort klipp),
+        Python + PyTorch + transformers (~GB), modell-nedlasting, og 24/7-drift + patching. Ingen per-minutt-kost, men du drifter ML-infra.</div>
+    </div>
+    <p class="ledd-meta">Ærlig: «STT_BACKEND=nb-whisper» i demoen er bare en <i>peker</i>. I produksjon må den modell-serveren
+    faktisk stå og kjøre et sted — egen GPU-maskin ELLER en GPU-VM i Azure som <b>dere</b> drifter (ikke Azure-managed).</p>
+  </div>
+
+  <div class="ledd">
+    <div class="ledd-h"><span class="ledd-n">3</span><span class="ledd-t">🧠 Analyse — tekst blir til innsikt</span></div>
+    <div class="ledd-meta">Transkriptet analyseres → QA-scorecard, sammendrag, sentiment, churn, compliance-flagg.</div>
+    <div class="two">
+      <div class="opt easy"><b>Sky (enkelt)</b> Azure OpenAI (EU) eller Claude/OpenAI-API. API-kall + nøkkel, per-token-kostnad. Sterkest kvalitet.</div>
+      <div class="opt hard"><b>Selvhostet (komplekst)</b> Lokal LLM (Ollama) på GPU — samme drifts-byrde som STT. ELLER regelbasert (demoens «mock»: gratis, men ikke ekte AI — god nok til pilot).</div>
+    </div>
+  </div>
+
+  <div class="ledd">
+    <div class="ledd-h"><span class="ledd-n">4</span><span class="ledd-t">💾 Lagring</span></div>
+    <div class="ledd-meta"><b>Kjører:</b> database (+ fil-lagring) lokalt ELLER i Azure (Postgres + Blob).</div>
+    <p>Transkript + analyse må lagres. Her gjelder personvern fullt ut: kryptering, tilgangsstyring, sletteregler,
+    databehandleravtale. <b>Demoen forenkler dette</b> (ingen ekte database ennå) — en produksjonsløsning trenger sikker lagring.</p>
+  </div>
+
+  <div class="ledd">
+    <div class="ledd-h"><span class="ledd-n">5</span><span class="ledd-t">📊 Applikasjon / dashboard</span></div>
+    <div class="ledd-meta"><b>Kjører:</b> en web-server — lokalt ELLER Azure (Container Apps / App Service).</div>
+    <p>Selve web-appen (denne demoen) som viser samtaler, dashboard og rapporter. Lettest å hoste i sky.</p>
+  </div>
+
+  <div class="ledd">
+    <div class="ledd-h"><span class="ledd-n">6</span><span class="ledd-t">🔁 Integrasjon tilbake til Loyaltys systemer</span></div>
+    <div class="ledd-meta"><b>Krav:</b> integrasjon mot deres CRM / QA-verktøy / rapporter.</div>
+    <p>Resultatene må inn der agentene og lederne faktisk jobber. Mer integrasjonsarbeid, avhenger av deres interne stack.
+    <b>Det er dette som gjør det til en kjede</b>, ikke én knapp.</p>
+  </div>
+
+  <div class="rek" style="margin-top:22px;">
+    <b>Oppsummert valg:</b> Vil dere bare i gang med forutsigbar kostnad og minimal drift → <b>sky (Azure EU)</b>.
+    Tenker dere langsiktig kostnad/personvern ved stort volum → <b>selvhostet senere</b> (med drift av modell-server).
+    Bruk <a href="/veiviser">🧭 Veiviseren</a> til å se hva ditt konkrete svar gir, ledd for ledd.
+  </div>
+</div>
+{% endblock %}

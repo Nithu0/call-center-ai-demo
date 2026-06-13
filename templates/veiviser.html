@@ -102,6 +102,10 @@
         <div class="rec-why" id="rec-deploy-why">—</div>
       </div>
       <div class="rec-row">
+        <div class="rec-k">🛠️ Hva det krever i praksis</div>
+        <div class="rec-why" id="rec-krever" style="color:var(--ink)">—</div>
+      </div>
+      <div class="rec-row">
         <div class="rec-k">🔒 Personvern</div>
         <div class="priv" id="rec-priv">—</div>
       </div>
@@ -133,26 +137,30 @@
     const norskKritisk = s.norsk === "kritisk";
     let r = { env: {} };
 
-    // Hvor bygges + STT
-    if (ownHw || (s.sensitiv === "ja" && (norskKritisk || highVol))) {
-      r.deploy = "NB-Whisper self-hosted (egen maskin eller Azure-GPU)";
-      r.deployWhy = "Data forlater aldri dere/EU — sterkeste personvern, og billigst ved høyt volum (egen modell, ingen per-minutt-regning).";
-      r.stt = "NB-Whisper (norsk-tunet, self-hosted)";
-      r.sttWhy = "Best norsk-nøyaktighet, kjører uten nøkkel/uten amerikansk sky. Full kontroll.";
+    // Hvor bygges + STT — respekterer eie/sky-valget ærlig.
+    if (ownHw) {
+      r.deploy = "Egen lokal server (hos dere)";
+      r.deployWhy = "Dere vil eie utstyret → data forlater aldri huset, og ingen per-minutt-regning.";
+      r.stt = "NB-Whisper (norsk, self-hosted)";
+      r.sttWhy = "Best norsk-nøyaktighet, kjører lokalt uten nøkkel/uten amerikansk sky.";
+      r.krever = "⚠️ Krever en GPU-server (8–24 GB VRAM) + at dere installerer og DRIFTER modellen 24/7. Reell ML-drift — ikke en avkrysningsboks.";
       r.env.DEPLOY_TARGET = "local"; r.env.STT_BACKEND = "nb-whisper";
       r.local = true;
     } else if (s.sensitiv === "ja") {
       r.deploy = "Azure (EU-region: Norge/Sverige)";
-      r.deployWhy = "Data behandles i EU under databehandleravtale — trygt for sensitive opptak, uten at dere drifter egen maskin.";
+      r.deployWhy = "Sensitivt + vil bruke sky → Azure i EU. Forutsigbar månedskostnad, ingen egen hardware, raskest til pilot, trygt (EU + databehandleravtale).";
       r.stt = "Azure AI Speech (nb-NO, EU)";
-      r.sttWhy = "Sterk norsk, EU-databehandling, skalerer i sky og er raskt å sette opp.";
+      r.sttWhy = "Sterk norsk, EU-databehandling, managed (Azure drifter modellen — ikke dere).";
+      r.krever = "Azure-konto + nøkkel. Per-bruk-kostnad (~1 kr/lydtime) — forutsigbar opex."
+        + (highVol ? " Ved svært høyt volum kan self-hostet NB-Whisper (på Azure-GPU) kutte kostnad SENERE — men da må dere drifte en modell-server." : "");
       r.env.DEPLOY_TARGET = "azure"; r.env.STT_BACKEND = "azure";
       r.local = false;
     } else {
-      r.deploy = (s.tempo === "rask") ? "Sky-API (raskest å koble på)" : "Azure (EU) eller lokal";
-      r.deployWhy = "Ikke-sensitive data → dere kan bruke en enkel sky-API og være i gang på minutter.";
+      r.deploy = "Sky-API (raskest å koble på)";
+      r.deployWhy = "Ikke-sensitive data → en enkel sky-API, oppe på minutter.";
       r.stt = "OpenAI Whisper API";
-      r.sttWhy = "Lavest friksjon: bare en API-nøkkel, billig. (Data går til USA — derfor kun for ikke-sensitivt.)";
+      r.sttWhy = "Lavest friksjon: bare en API-nøkkel, billig.";
+      r.krever = "OpenAI-nøkkel. ⚠️ Data går til USA — kun for ikke-sensitivt.";
       r.env.DEPLOY_TARGET = "local"; r.env.STT_BACKEND = "openai";
       r.local = true;
     }
@@ -194,6 +202,7 @@
     document.getElementById("rec-llm-why").textContent = r.llmWhy;
     document.getElementById("rec-deploy").textContent = r.deploy;
     document.getElementById("rec-deploy-why").textContent = r.deployWhy;
+    document.getElementById("rec-krever").textContent = r.krever || "";
     const p = document.getElementById("rec-priv");
     p.textContent = r.priv; p.className = "priv " + r.privCls;
     document.getElementById("rec-env").textContent =
