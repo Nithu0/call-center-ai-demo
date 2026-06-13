@@ -1,0 +1,548 @@
+{% extends "base.html" %}
+{% block title %}Agent-assist (live) — Loyalty AI{% endblock %}
+{% block content %}
+
+<style>
+/* ============================================================
+   Agent-assist — scoped til denne siden. Bygger på style.css-tokens.
+   ============================================================ */
+.aa-header { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:6px 0 4px; }
+.aa-header h1 { margin:0; font-size:1.6rem; }
+.aa-live-dot {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:5px 12px; border-radius:999px; font-size:.74rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.06em;
+  background:var(--fail-bg); color:var(--fail); border:1px solid rgba(248,113,113,.35);
+}
+.aa-live-dot .dot {
+  width:9px; height:9px; border-radius:50%; background:var(--fail);
+  box-shadow:0 0 0 0 rgba(248,113,113,.6); animation:aaPulse 1.4s infinite;
+}
+@keyframes aaPulse {
+  0%   { box-shadow:0 0 0 0 rgba(248,113,113,.55); }
+  70%  { box-shadow:0 0 0 8px rgba(248,113,113,0); }
+  100% { box-shadow:0 0 0 0 rgba(248,113,113,0); }
+}
+.aa-meta { color:var(--muted); font-size:.88rem; margin-left:auto; display:flex; align-items:center; gap:10px; }
+.aa-meta select {
+  background:var(--panel); color:var(--ink); border:1px solid var(--line);
+  border-radius:9px; padding:7px 10px; font-size:.85rem; font-family:inherit;
+}
+
+.aa-disclaimer {
+  margin:14px 0 0; display:flex; align-items:center; gap:10px;
+  background:rgba(124,92,255,.10); border:1px solid rgba(124,92,255,.3);
+  color:#c7bbff; border-radius:12px; padding:10px 14px; font-size:.9rem; font-weight:600;
+}
+.aa-disclaimer .ico { font-size:1.1rem; }
+
+/* split */
+.aa-split { display:grid; grid-template-columns:1.05fr 1fr; gap:22px; margin-top:18px; align-items:start; }
+@media (max-width:1000px){ .aa-split { grid-template-columns:1fr; } }
+
+/* ---- venstre: samtale ---- */
+.aa-controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+.aa-progress { margin-left:auto; color:var(--muted); font-size:.82rem; font-weight:700; }
+.aa-btn-ghost {
+  background:var(--panel-2); color:var(--ink); border:1px solid var(--line);
+  border-radius:10px; padding:9px 14px; font-size:.86rem; font-weight:700; cursor:pointer;
+  transition:all .15s ease;
+}
+.aa-btn-ghost:hover { border-color:rgba(91,140,255,.45); }
+.aa-btn-ghost:disabled { opacity:.5; cursor:default; }
+
+.aa-convo { display:grid; gap:10px; min-height:120px; }
+.aa-empty { color:var(--faint); font-size:.92rem; padding:8px 2px; }
+.aa-turn {
+  display:grid; grid-template-columns:74px 1fr; gap:12px; padding:11px 13px;
+  border-radius:10px; border:1px solid var(--line-soft);
+  animation:aaIn .35s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes aaIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+.aa-turn.agent { background:rgba(91,140,255,.07); }
+.aa-turn.kunde { background:rgba(251,191,36,.05); }
+.aa-turn .who {
+  font-size:.66rem; text-transform:uppercase; font-weight:800; letter-spacing:.05em;
+  color:var(--muted); padding-top:2px;
+}
+.aa-turn.agent .who { color:#9fb8ff; }
+.aa-turn.kunde .who { color:#fcd34d; }
+.aa-turn.latest { box-shadow:0 0 0 1px rgba(91,140,255,.35); border-color:rgba(91,140,255,.4); }
+
+/* ---- høyre: assist-panel ---- */
+.aa-assist { display:grid; gap:16px; position:sticky; top:80px; }
+.aa-card {
+  background:var(--panel); border:1px solid var(--line); border-radius:14px;
+  padding:16px 18px; box-shadow:var(--shadow);
+}
+.aa-card h3 {
+  font-size:.74rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);
+  margin:0 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line-soft);
+  display:flex; align-items:center; gap:8px; justify-content:space-between;
+}
+.aa-card h3 .count {
+  font-size:.7rem; background:var(--bg-2); color:var(--muted);
+  border:1px solid var(--line); border-radius:999px; padding:1px 8px;
+}
+.aa-list { list-style:none; margin:0; padding:0; display:grid; gap:9px; }
+.aa-item {
+  border-radius:10px; padding:11px 13px; font-size:.92rem; line-height:1.45;
+  animation:aaIn .3s ease both;
+}
+.aa-item .tag {
+  display:inline-block; font-size:.64rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:.06em; padding:2px 7px; border-radius:6px; margin-bottom:5px;
+}
+.aa-item .body { color:var(--ink); }
+.aa-item .src { display:block; color:var(--faint); font-size:.76rem; margin-top:5px; }
+
+/* fargevarianter */
+.aa-nba   { background:rgba(91,140,255,.08); border:1px solid rgba(91,140,255,.28); }
+.aa-nba   .tag { background:rgba(91,140,255,.18); color:#9fb8ff; }
+.aa-know  { background:rgba(52,211,153,.07); border:1px solid rgba(52,211,153,.25); }
+.aa-know  .tag { background:rgba(52,211,153,.16); color:var(--pass); }
+.aa-comp  { background:var(--warn-bg); border:1px solid rgba(251,191,36,.3); }
+.aa-comp  .tag { background:rgba(251,191,36,.18); color:var(--warn); }
+.aa-comp.done { background:var(--pass-bg); border-color:rgba(52,211,153,.3); }
+.aa-comp.done .tag { background:rgba(52,211,153,.16); color:var(--pass); }
+.aa-comp.done .body { color:var(--pass); }
+
+.aa-placeholder { color:var(--faint); font-size:.88rem; font-style:italic; }
+
+/* QA-måler */
+.aa-qa-top { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:6px; }
+.aa-qa-pct { font-weight:800; font-size:1.5rem; }
+.aa-qa-pct.good { color:var(--pass); } .aa-qa-pct.mid { color:var(--warn); } .aa-qa-pct.bad { color:var(--muted); }
+.aa-qa-sub { color:var(--muted); font-size:.8rem; }
+.aa-qa-bar { height:9px; border-radius:999px; background:#0d1422; overflow:hidden; border:1px solid var(--line-soft); margin-bottom:14px; }
+.aa-qa-fill { height:100%; border-radius:999px; width:0; transition:width .6s cubic-bezier(.2,.8,.2,1); background:linear-gradient(90deg,#d97706,var(--warn)); }
+.aa-qa-fill.good { background:linear-gradient(90deg,#10b981,var(--pass)); }
+.aa-checklist { list-style:none; margin:0; padding:0; display:grid; gap:7px; }
+.aa-check { display:grid; grid-template-columns:22px 1fr; gap:9px; align-items:center; font-size:.88rem; color:var(--muted); transition:color .2s; }
+.aa-check .mk {
+  width:20px; height:20px; border-radius:6px; border:1px solid var(--line);
+  display:inline-flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:800;
+  color:var(--faint); background:var(--bg-2); transition:all .25s;
+}
+.aa-check.hit { color:var(--ink); }
+.aa-check.hit .mk { background:var(--pass-bg); border-color:rgba(52,211,153,.4); color:var(--pass); transform:scale(1.04); }
+</style>
+
+<p><a class="back" href="/">← Alle samtaler</a></p>
+
+<div class="aa-header">
+  <span class="aa-live-dot"><span class="dot"></span> Live samtale</span>
+  <h1>🧑‍💻 Agent-assist</h1>
+  <span class="aa-meta">
+    <label for="aa-sample" class="muted">Samtale:</label>
+    <select id="aa-sample" onchange="if(this.value)window.location.href='/agent-assist?name='+this.value;">
+      {% for s in samples %}
+        <option value="{{ s.name }}" {{ 'selected' if s.name == chosen else '' }}>{{ s.title or s.name }}</option>
+      {% endfor %}
+    </select>
+  </span>
+</div>
+
+<p class="muted" style="margin:.3rem 0 0;">
+  Agentens skjerm <strong>mens samtalen pågår</strong>. Spill av samtalen replikk for replikk —
+  panelet til høyre forslår neste handling, finner kunnskaps-svar, minner om compliance
+  og fyller QA-måleren i sanntid.
+</p>
+
+<div class="aa-disclaimer">
+  <span class="ico">🤖</span>
+  <span><strong>AI-forslag — agenten beslutter.</strong> Forslagene er beslutningsstøtte i sanntid, ikke automatikk. Ingenting sendes eller utføres uten at agenten velger det.</span>
+</div>
+
+<div class="aa-split">
+  <!-- VENSTRE: samtalen rulles inn -->
+  <section class="panel">
+    <div class="panel-head"><h2>📞 Samtale</h2></div>
+    <div class="aa-controls">
+      <button id="aa-next" class="btn" type="button">▶ Neste replikk</button>
+      <button id="aa-play" class="aa-btn-ghost" type="button">▶▶ Spill av</button>
+      <button id="aa-reset" class="aa-btn-ghost" type="button">↺ Start på nytt</button>
+      <span class="aa-progress" id="aa-progress">0 / 0</span>
+    </div>
+    <div class="aa-convo" id="aa-convo">
+      <p class="aa-empty">Trykk «▶ Neste replikk» eller «▶▶ Spill av» for å starte samtalen …</p>
+    </div>
+  </section>
+
+  <!-- HØYRE: sanntids assist -->
+  <aside class="aa-assist">
+    <!-- QA-måler -->
+    <div class="aa-card">
+      <h3>📊 Live QA-måler <span class="count" id="aa-qa-count">0 / 0</span></h3>
+      <div class="aa-qa-top">
+        <span class="aa-qa-pct bad" id="aa-qa-pct">0%</span>
+        <span class="aa-qa-sub" id="aa-qa-sub">Sjekkliste-punkter truffet så langt</span>
+      </div>
+      <div class="aa-qa-bar"><div class="aa-qa-fill" id="aa-qa-fill"></div></div>
+      <ul class="aa-checklist" id="aa-checklist"></ul>
+    </div>
+
+    <!-- Neste beste handling -->
+    <div class="aa-card">
+      <h3>🎯 Neste beste handling <span class="count" id="aa-nba-count">0</span></h3>
+      <ul class="aa-list" id="aa-nba">
+        <li class="aa-placeholder">Forslag dukker opp når samtalen starter …</li>
+      </ul>
+    </div>
+
+    <!-- Kunnskaps-svar -->
+    <div class="aa-card">
+      <h3>📚 Kunnskaps-svar <span class="count" id="aa-know-count">0</span></h3>
+      <ul class="aa-list" id="aa-know">
+        <li class="aa-placeholder">Relevant info agenten kan lese opp vises her …</li>
+      </ul>
+    </div>
+
+    <!-- Compliance -->
+    <div class="aa-card">
+      <h3>⚖️ Compliance-påminnelser <span class="count" id="aa-comp-count">0</span></h3>
+      <ul class="aa-list" id="aa-comp">
+        <li class="aa-placeholder">Påminnelser (samtykke, angrerett, ID …) dukker opp ved behov …</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<script>
+/* ============================================================================
+   Agent-assist — REGELBASERT sanntids-motor (deterministisk, ingen LLM).
+   Replikkene avsløres én etter én; for hver synlige replikk kjører vi et sett
+   nøkkelord-regler som genererer Neste beste handling / Kunnskaps-svar /
+   Compliance-påminnelser, og krysser av QA-sjekkliste-punkter.
+   ============================================================================ */
+(function () {
+  "use strict";
+
+  // Replikkene fra serveren (stt.transcribe -> turns).
+  const TURNS = {{ turns | tojson }};
+  const callType = {{ transcript.call_type | tojson }};
+
+  // ---- DOM ----
+  const convo = document.getElementById("aa-convo");
+  const btnNext = document.getElementById("aa-next");
+  const btnPlay = document.getElementById("aa-play");
+  const btnReset = document.getElementById("aa-reset");
+  const prog = document.getElementById("aa-progress");
+
+  const elNba = document.getElementById("aa-nba");
+  const elKnow = document.getElementById("aa-know");
+  const elComp = document.getElementById("aa-comp");
+  const cntNba = document.getElementById("aa-nba-count");
+  const cntKnow = document.getElementById("aa-know-count");
+  const cntComp = document.getElementById("aa-comp-count");
+
+  const qaPct = document.getElementById("aa-qa-pct");
+  const qaFill = document.getElementById("aa-qa-fill");
+  const qaCount = document.getElementById("aa-qa-count");
+  const qaSub = document.getElementById("aa-qa-sub");
+  const checklistEl = document.getElementById("aa-checklist");
+
+  // ---- QA-sjekkliste (Loyalty-stil). Hvert punkt har en matcher mot agentens
+  //      replikker. Truffet → punktet fylles og QA-måleren stiger. ----
+  const CHECKLIST = [
+    { key: "greet",    label: "Profesjonell åpning (hilser + presenterer seg)",
+      test: (t) => t.speaker === "agent" && /(velkommen|hei|du snakker med|takk for at du ringer)/i.test(t.text) },
+    { key: "identify", label: "Identifiserer / bekrefter kunde",
+      test: (t) => t.speaker === "agent" && /(kundenummer|bekrefte navn|hvem jeg snakker med|snakker jeg med|bekrefte.*identitet)/i.test(t.text) },
+    { key: "needs",    label: "Kartlegger behov / stiller åpne spørsmål",
+      test: (t) => t.speaker === "agent" && /(hva kan jeg hjelpe|grunnen til|hva.*bruker mest|hvilke|hva er det du|får jeg lov til å spørre|noen.*spørsmål)/i.test(t.text) },
+    { key: "empathy",  label: "Viser empati / anerkjenner kunden",
+      test: (t) => t.speaker === "agent" && /(forstår|godt poeng|det skjønner jeg|helt forståelig|beklager|takk for det)/i.test(t.text) },
+    { key: "offer",    label: "Gir relevant tilbud / løsning",
+      test: (t) => t.speaker === "agent" && /(tilby|anbefaler|lojalitetstilbud|pakke|kampanje|rabatt|løsning|kroner i måneden)/i.test(t.text) },
+    { key: "consent",  label: "Innhenter samtykke før endring/salg",
+      test: (t) => t.speaker === "agent" && /(samtykke|bekrefter du|godtar du|er det greit at jeg|ønsker du at jeg)/i.test(t.text) },
+    { key: "summary",  label: "Oppsummerer / bekrefter neste steg",
+      test: (t) => t.speaker === "agent" && /(registrert|bekreftelse på e-post|jeg sender deg|noterer|jeg ringer deg tilbake|sender.*skriftlig)/i.test(t.text) },
+    { key: "close",    label: "Profesjonell avslutning",
+      test: (t) => t.speaker === "agent" && /(ha en fin dag|takk for praten|takk for hjelpen|fortsetter hos oss)/i.test(t.text) },
+  ];
+  const hitChecks = new Set();
+
+  // ---- Forslags-regler. Hver regel ser på SISTE replikk (og hvem som snakker)
+  //      og kan returnere ett forslag. `once` = vis maks én gang. ----
+  // Type: "nba" | "know" | "comp". `done` (comp) markeres når en oppfølgings-
+  //      regel slår til (f.eks. samtykke faktisk innhentet → compliance møtt).
+  const seen = new Set();        // dedup på id
+  const compById = new Map();    // comp-id -> li-element (for å markere "møtt")
+
+  function add(target, item) {
+    if (item.once && seen.has(item.id)) return;
+    seen.add(item.id);
+    const ul = target === "nba" ? elNba : target === "know" ? elKnow : elComp;
+    // fjern placeholder
+    const ph = ul.querySelector(".aa-placeholder");
+    if (ph) ph.remove();
+    const li = document.createElement("li");
+    li.className = "aa-item " + (target === "nba" ? "aa-nba" : target === "know" ? "aa-know" : "aa-comp");
+    li.innerHTML =
+      `<span class="tag">${item.tag}</span>` +
+      `<span class="body">${item.body}</span>` +
+      (item.src ? `<span class="src">📎 ${item.src}</span>` : "");
+    // nyeste øverst
+    ul.insertBefore(li, ul.firstChild);
+    if (target === "comp" && item.id) compById.set(item.id, li);
+    bumpCounts();
+  }
+
+  function markCompDone(id, label) {
+    const li = compById.get(id);
+    if (li && !li.classList.contains("done")) {
+      li.classList.add("done");
+      li.querySelector(".tag").textContent = "MØTT";
+      if (label) li.querySelector(".body").innerHTML = label;
+    }
+  }
+
+  function bumpCounts() {
+    const n = (ul) => Math.max(0, ul.querySelectorAll(".aa-item").length);
+    cntNba.textContent = n(elNba);
+    cntKnow.textContent = n(elKnow);
+    cntComp.textContent = n(elComp);
+  }
+
+  // helper
+  const has = (txt, re) => re.test(txt);
+
+  // ---- Regelmotor: kalt for HVER ny synlig replikk ----
+  function runRules(turn, idx) {
+    const txt = turn.text;
+    const isCust = turn.speaker === "kunde";
+    const isAgent = turn.speaker === "agent";
+
+    // --- Compliance: ID ikke verifisert tidlig ---
+    if (idx <= 1 && isAgent) {
+      add("comp", {
+        id: "id-verify", tag: "ID", once: true,
+        body: "ID ikke verifisert ennå — bekreft navn + kundenummer før du deler konto-detaljer.",
+      });
+    }
+    // ID faktisk bekreftet -> marker møtt
+    if (isAgent && has(txt, /(da har jeg deg her|takk, da har jeg|jeg ser at du|finner jeg avtalen)/i)) {
+      markCompDone("id-verify", "ID verifisert — kunde bekreftet. ✔");
+    }
+    if (isCust && has(txt, /kundenummer|kundenr|fødselsnummer/i)) {
+      markCompDone("id-verify", "ID verifisert — kundenummer oppgitt. ✔");
+    }
+
+    // --- Kunde uttrykker oppsigelse / churn ---
+    if (isCust && has(txt, /(si opp|oppsigelse|avslutte|kansellere|bytte leverandør)/i)) {
+      add("nba", {
+        id: "retention-save", tag: "Retention", once: true,
+        body: "Churn-signal: kunden vil si opp. <b>Kartlegg årsak</b> før du tilbyr noe — still ett åpent spørsmål («hva er grunnen?»).",
+      });
+      add("know", {
+        id: "retention-ladder", tag: "Kunnskap", once: true,
+        body: "Retention-trapp: 1) lytt til årsak, 2) tilby <b>lojalitetsrabatt</b> (samme innhold), 3) tilby <b>lettpakke</b> hvis lav bruk. Du har fullmakt opptil 40% rabatt.",
+        src: "Loyalty playbook — Retention",
+      });
+    }
+
+    // --- Kunde nevner pris / for dyrt ---
+    if (isCust && has(txt, /(for dyrt|dyrt|billigere|pris|koster for mye|spare)/i)) {
+      add("nba", {
+        id: "price-objection", tag: "Innvending", once: true,
+        body: "Pris-innvending: anerkjenn det, og tilby <b>lojalitetsrabatt</b> eller en rimeligere pakke som matcher faktisk bruk.",
+      });
+      add("know", {
+        id: "price-tiers", tag: "Kunnskap", once: true,
+        body: "Prisnivåer: Standard 599 · <b>Lojalitet 349</b> (samme innhold) · Lettpakke 199 (strømming + data). Ingen bindingstid på lettpakke.",
+        src: "Prisliste 2026",
+      });
+    }
+
+    // --- Salgskontekst: produkt/tilbud presenteres -> husk angrerett/binding ---
+    if (isAgent && has(txt, /(tilby|anbefaler|kampanje|pakke|kroner i måneden|installasjon)/i)) {
+      if (callType === "salg" || has(txt, /kampanje|installasjon|bindingstid|binding/i)) {
+        add("comp", {
+          id: "angrerett", tag: "Angrerett", once: true,
+          body: "Husk <b>angrerett</b>: ved fjernsalg har forbruker 14 dagers angrerett. Opplys om dette + send angrerettskjema skriftlig.",
+        });
+      }
+    }
+
+    // --- Bindingstid nevnt -> opplysningsplikt ---
+    if (isAgent && has(txt, /(bindingstid|binding|12 måneder|oppsigelse)/i)) {
+      add("comp", {
+        id: "binding-info", tag: "Opplysning", once: true,
+        body: "Opplys tydelig om <b>bindingstid og oppsigelsesvilkår</b> før kunden takker ja.",
+      });
+    }
+
+    // --- Kunde vil tenke seg om / sjekke med andre ---
+    if (isCust && has(txt, /(tenke|diskutere|snakke med|må sjekke|komme tilbake til)/i)) {
+      add("nba", {
+        id: "callback", tag: "Oppfølging", once: true,
+        body: "Ikke press. Foreslå en <b>konkret oppfølging</b> (avtal dag + klokkeslett) og send tilbudet skriftlig i mellomtiden.",
+      });
+    }
+
+    // --- Agent forsøker salg/endring uten å ha hentet samtykke ---
+    if (isAgent && has(txt, /(bytter deg over|registrerer|setter i gang|ønsker du at jeg)/i)) {
+      add("comp", {
+        id: "consent", tag: "Samtykke", once: true,
+        body: "Bekreft <b>samtykke før salg/endring</b>: be kunden eksplisitt bekrefte beløp + vilkår.",
+      });
+    }
+    // Samtykke faktisk innhentet -> møtt
+    if (isAgent && has(txt, /(bekrefter du at du vil|trenger bare ditt samtykke|godtar du)/i)) {
+      // sørg for at kortet finnes før vi markerer
+      add("comp", {
+        id: "consent", tag: "Samtykke", once: true,
+        body: "Bekreft <b>samtykke før salg/endring</b>: be kunden eksplisitt bekrefte beløp + vilkår.",
+      });
+    }
+    if (isCust && has(txt, /(ja, det bekrefter jeg|det bekrefter jeg|ja, det gjør vi|ja, det stemmer)/i)) {
+      markCompDone("consent", "Samtykke innhentet — kunde bekreftet eksplisitt. ✔");
+    }
+
+    // --- Kunde takker ja / aksepterer ---
+    if (isCust && has(txt, /(det gjør vi|høres riktig ut|det passer fint|ja.*det|gjør det)/i) && idx > 2) {
+      add("nba", {
+        id: "confirm-next", tag: "Avslutning", once: true,
+        body: "Kunde positiv: <b>oppsummer avtalen</b>, bekreft beløp + at e-postbekreftelse sendes, og avslutt profesjonelt.",
+      });
+    }
+
+    // --- Klage / negativ ---
+    if (isCust && has(txt, /(klage|misfornøyd|dårlig|elendig|skuffet|frustrert)/i)) {
+      add("nba", {
+        id: "deescalate", tag: "Deeskaler", once: true,
+        body: "Negativt signal: <b>anerkjenn først</b>, beklag ulempen, og ta eierskap til en konkret løsning.",
+      });
+    }
+  }
+
+  // ---- Avsløring av replikker ----
+  let idx = 0;          // antall synlige replikker
+  let playing = false;
+  let timer = null;
+
+  function renderProgress() {
+    prog.textContent = `${idx} / ${TURNS.length}`;
+    btnNext.disabled = idx >= TURNS.length;
+  }
+
+  function reveal() {
+    if (idx >= TURNS.length) { stopAuto(); return; }
+    const turn = TURNS[idx];
+
+    // fjern empty
+    const empty = convo.querySelector(".aa-empty");
+    if (empty) empty.remove();
+
+    // marker forrige som ikke-latest
+    const prev = convo.querySelector(".aa-turn.latest");
+    if (prev) prev.classList.remove("latest");
+
+    const div = document.createElement("div");
+    div.className = `aa-turn ${turn.speaker} latest`;
+    div.innerHTML =
+      `<span class="who">${turn.speaker === "agent" ? "Agent" : "Kunde"}</span>` +
+      `<span class="text"></span>`;
+    div.querySelector(".text").textContent = turn.text;
+    convo.appendChild(div);
+    div.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+    runRules(turn, idx);
+
+    // oppdater QA etter at agent-replikken er synlig
+    CHECKLIST.forEach((c) => {
+      if (!hitChecks.has(c.key) && c.test(turn)) hitChecks.add(c.key);
+    });
+    renderQA();
+
+    idx += 1;
+    renderProgress();
+  }
+
+  function renderQA() {
+    const total = CHECKLIST.length;
+    const hit = hitChecks.size;
+    const pct = Math.round((100 * hit) / total);
+    qaPct.textContent = pct + "%";
+    qaCount.textContent = `${hit} / ${total}`;
+    qaFill.style.width = pct + "%";
+    qaPct.className = "aa-qa-pct " + (pct >= 70 ? "good" : pct >= 35 ? "mid" : "bad");
+    qaFill.className = "aa-qa-fill" + (pct >= 70 ? " good" : "");
+    qaSub.textContent = idx >= TURNS.length
+      ? "Samtale ferdig — endelig QA-score"
+      : "Sjekkliste-punkter truffet så langt";
+  }
+
+  function buildChecklist() {
+    checklistEl.innerHTML = "";
+    CHECKLIST.forEach((c) => {
+      const li = document.createElement("li");
+      li.className = "aa-check" + (hitChecks.has(c.key) ? " hit" : "");
+      li.id = "chk-" + c.key;
+      li.innerHTML = `<span class="mk">${hitChecks.has(c.key) ? "✓" : ""}</span><span>${c.label}</span>`;
+      checklistEl.appendChild(li);
+    });
+  }
+  function refreshChecklistMarks() {
+    CHECKLIST.forEach((c) => {
+      const li = document.getElementById("chk-" + c.key);
+      if (!li) return;
+      if (hitChecks.has(c.key) && !li.classList.contains("hit")) {
+        li.classList.add("hit");
+        li.querySelector(".mk").textContent = "✓";
+      }
+    });
+  }
+
+  // wrap renderQA to also refresh marks
+  const _renderQA = renderQA;
+  renderQA = function () { _renderQA(); refreshChecklistMarks(); };
+
+  function startAuto() {
+    if (idx >= TURNS.length) return;
+    playing = true;
+    btnPlay.textContent = "⏸ Pause";
+    btnPlay.classList.add("btn");
+    btnPlay.classList.remove("aa-btn-ghost");
+    timer = setInterval(() => {
+      reveal();
+      if (idx >= TURNS.length) stopAuto();
+    }, 2200);
+  }
+  function stopAuto() {
+    playing = false;
+    if (timer) { clearInterval(timer); timer = null; }
+    btnPlay.textContent = "▶▶ Spill av";
+    btnPlay.classList.add("aa-btn-ghost");
+    btnPlay.classList.remove("btn");
+  }
+
+  function resetAll() {
+    stopAuto();
+    idx = 0;
+    hitChecks.clear();
+    seen.clear();
+    compById.clear();
+    convo.innerHTML = '<p class="aa-empty">Trykk «▶ Neste replikk» eller «▶▶ Spill av» for å starte samtalen …</p>';
+    elNba.innerHTML = '<li class="aa-placeholder">Forslag dukker opp når samtalen starter …</li>';
+    elKnow.innerHTML = '<li class="aa-placeholder">Relevant info agenten kan lese opp vises her …</li>';
+    elComp.innerHTML = '<li class="aa-placeholder">Påminnelser (samtykke, angrerett, ID …) dukker opp ved behov …</li>';
+    buildChecklist();
+    renderQA();
+    renderProgress();
+  }
+
+  // ---- wiring ----
+  btnNext.addEventListener("click", () => { if (playing) stopAuto(); reveal(); });
+  btnPlay.addEventListener("click", () => { playing ? stopAuto() : startAuto(); });
+  btnReset.addEventListener("click", resetAll);
+
+  // init
+  buildChecklist();
+  renderQA();
+  renderProgress();
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+{
+  "name": "forsikring_skademelding",
+  "call_type": "kundeservice",
+  "title": "Skademelding — vannlekkasje, stresset kunde (innkommende)",
+  "turns": [
+    { "speaker": "agent", "text": "Hei, du har ringt Sikring Forsikring skadeavdeling, du snakker med Thomas. Hvem snakker jeg med?" },
+    { "speaker": "kunde", "text": "Hei, jeg heter Linnea Bakke. Det har vært en vannlekkasje hjemme hos meg og hele kjellerstua står under vann, jeg vet ikke hva jeg skal gjøre." },
+    { "speaker": "agent", "text": "Å nei, det høres virkelig stressende ut, Linnea. Det viktigste først: er alle trygge, og er strømmen i kjelleren slått av?" },
+    { "speaker": "kunde", "text": "Ja, vi er trygge, og mannen min slo av sikringen. Men det er så mye vann, jeg er helt i panikk." },
+    { "speaker": "agent", "text": "Du gjorde helt riktig som slo av strømmen. Nå skal jeg hjelpe deg gjennom dette steg for steg, så det blir håndterbart. Kan du først bekrefte fødselsnummer eller kundenummer så jeg finner forsikringen din?" },
+    { "speaker": "kunde", "text": "Kundenummeret er 7741920." },
+    { "speaker": "agent", "text": "Takk. Jeg ser du har innbo- og bygningsforsikring med dekning for vannskade, så dette er du dekket for. Kan du fortelle meg når du oppdaget lekkasjen og hvor vannet kommer fra?" },
+    { "speaker": "kunde", "text": "Vi oppdaget det for en time siden. Det ser ut som det kommer fra en sprukket rør under vasken på vaskerommet." },
+    { "speaker": "agent", "text": "Greit, det noterer jeg. Har du mulighet til å stenge hovedstoppekranen for vannet? Det stopper tilførselen mens vi får folk på plass." },
+    { "speaker": "kunde", "text": "Ja, det kan mannen min gjøre nå. Men hva med alt vannet som allerede er der?" },
+    { "speaker": "agent", "text": "Det tar vi oss av. Jeg sender et skadesaneringsfirma som rykker ut i dag for å pumpe ut vann og starte tørking. Du skal ikke måtte rydde dette alene. Ta gjerne bilder av skaden før noe flyttes, det hjelper saksbehandlingen." },
+    { "speaker": "kunde", "text": "Okei, det føles litt bedre å høre. Så jeg trenger ikke betale for det selv?" },
+    { "speaker": "agent", "text": "Du betaler kun egenandelen på 6 000 kroner, resten dekker forsikringen. Jeg oppretter skadesaken nå, og du får et saksnummer på SMS som du kan bruke i all videre kontakt." },
+    { "speaker": "kunde", "text": "Tusen takk. Jeg var så redd dette skulle bli en katastrofe." },
+    { "speaker": "agent", "text": "Det skal vi sørge for at det ikke blir, Linnea. Skadefirmaet ringer deg innen en time for å avtale oppmøte. Pust rolig, du er i trygge hender nå. Var det noe mer du lurer på?" },
+    { "speaker": "kunde", "text": "Nei, det var alt. Takk for at du var så rolig med meg." },
+    { "speaker": "agent", "text": "Selvfølgelig. Ta vare på deg selv, så hører vi fra hverandre. Ha det." }
+  ]
+}

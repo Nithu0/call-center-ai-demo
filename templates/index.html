@@ -1,35 +1,88 @@
 {% extends "base.html" %}
-{% block title %}Samtaler — Loyalty AI{% endblock %}
+{% block title %}Loyalty AI — call-senter-plattform{% endblock %}
 {% block content %}
+<link rel="stylesheet" href="/static/dashboard.css" />
 
 <section class="hero">
   <div class="hero-text">
-    <span class="eyebrow">AI for call-senter</span>
-    <h1>Hver samtale, automatisk analysert</h1>
+    <span class="eyebrow">AI for norsk kundedialog</span>
+    <h1>Kvalitet, innsikt og effektivitet — på hver eneste samtale</h1>
     <p class="lead">
-      Transkripsjon, sammendrag, sentiment, QA-scorecard, nøkkelinfo, compliance-flagg
-      og foreslått oppfølging — for hver eneste samtale, ikke bare stikkprøver.
+      Plattformen transkriberer, scorer og analyserer alle kundesamtaler automatisk —
+      QA, sentiment, churn-risiko, nøkkelinfo og compliance — lokalt eller på Azure, med norsk tale-til-tekst i EU.
     </p>
+
     <div class="hero-stats">
-      <div class="stat"><strong>{{ samples | length }}</strong><span>demo-samtaler</span></div>
-      <div class="stat"><strong>100%</strong><span>dekning</span></div>
-      <div class="stat"><strong>~2&nbsp;env</strong><span>til Azure</span></div>
+      <div class="stat"><strong>100%</strong><span>QA-dekning (vs. 1–2% stikkprøve)</span></div>
+      <div class="stat"><strong>8–15 t</strong><span>spart / saksbehandler / uke</span></div>
+      <div class="stat"><strong>Churn</strong><span>fanget tidlig, før kunden ringer opp</span></div>
+      <div class="stat"><strong>Norsk STT</strong><span>lokalt eller i EU</span></div>
     </div>
 
-    <a class="call-card hero-cta" href="/live">
-      <span class="badge badge-live">🎙️ Live</span>
-      <span class="call-body">
-        <span class="call-title">Snakk inn en samtale → se AI-en transkribere og analysere live</span>
-        <span class="call-meta">Sanntid tale-til-tekst + AI-analyse</span>
-      </span>
-      <span class="call-go" aria-hidden="true">→</span>
-    </a>
+    <div class="hero-ctas" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px;">
+      <a class="btn" href="/live">🎙️ Prøv live-demo</a>
+      <a class="btn btn-ghost" href="/dashboard">📊 Se dashboard</a>
+      <a class="btn btn-ghost" href="/eval">📈 Effekt &amp; ROI</a>
+    </div>
   </div>
 </section>
 
+<!-- Use-case-kort, gruppert -->
 <div class="section-head">
+  <h2>Hva plattformen gjør</h2>
+  <p class="muted">Fire områder — klikk for å se det i demoen.</p>
+</div>
+
+<ul class="call-list usecase-grid">
+  <li class="call-card" style="--i: 0">
+    <a href="/dashboard">
+      <span class="badge badge-salg">Kvalitet</span>
+      <span class="call-body">
+        <span class="call-title">Automatisk QA &amp; scorecard</span>
+        <span class="call-meta">Hver samtale scores mot kvalitetskriteriene — ingen manuell lytting.</span>
+      </span>
+      <span class="call-go" aria-hidden="true">→</span>
+    </a>
+  </li>
+
+  <li class="call-card" style="--i: 1">
+    <a href="/dashboard">
+      <span class="badge badge-kundeservice">Innsikt</span>
+      <span class="call-body">
+        <span class="call-title">Sammendrag, sentiment &amp; voice-of-customer</span>
+        <span class="call-meta">Aggregerte trender og henvendelsesårsaker på tvers av porteføljen.</span>
+      </span>
+      <span class="call-go" aria-hidden="true">→</span>
+    </a>
+  </li>
+
+  <li class="call-card" style="--i: 2">
+    <a href="/eval">
+      <span class="badge badge-salg">Salg &amp; retention</span>
+      <span class="call-body">
+        <span class="call-title">Churn-varsling, coaching &amp; mersalg</span>
+        <span class="call-meta">Fang risiko-kunder tidlig og dokumentér effekt og ROI.</span>
+      </span>
+      <span class="call-go" aria-hidden="true">→</span>
+    </a>
+  </li>
+
+  <li class="call-card" style="--i: 3">
+    <a href="/redaction">
+      <span class="badge badge-ukjent">Compliance</span>
+      <span class="call-body">
+        <span class="call-title">Samtykke-sjekk &amp; PII-maskering</span>
+        <span class="call-meta">Compliance-flagg per samtale + maskering av personopplysninger.</span>
+      </span>
+      <span class="call-go" aria-hidden="true">→</span>
+    </a>
+  </li>
+</ul>
+
+<!-- Eksisterende sample-samtale-liste -->
+<div class="section-head" style="margin-top: 34px;">
   <h2>Velg en samtale</h2>
-  <p class="muted">Klikk for transkript + full AI-analyse.</p>
+  <p class="muted">Klikk for transkript + full AI-analyse. <strong>{{ samples | length }}</strong> demo-samtaler.</p>
 </div>
 
 <ul class="call-list">

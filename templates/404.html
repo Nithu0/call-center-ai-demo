@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Siden finnes ikke — Loyalty AI{% endblock %}
+{% block content %}
+<section class="hero" style="text-align: center;">
+  <div class="hero-text" style="margin: 0 auto; max-width: 60ch;">
+    <span class="eyebrow">404 — Fant ikke siden</span>
+    <h1>Siden finnes ikke</h1>
+    <p class="lead">
+      Adressen du prøvde å åpne finnes ikke (eller er flyttet). Det er ikke noe
+      galt med deg — lenken peker bare et sted som ikke er her.
+    </p>
+
+    <div class="hero-ctas" style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 26px;">
+      <a class="btn" href="/">🏠 Til forsiden</a>
+      <a class="btn btn-ghost" href="/guide">📘 Åpne guiden</a>
+    </div>
+
+    <p class="muted" style="margin-top: 22px;">
+      Vet du ikke helt hvor du skal? <a href="/guide">Guiden</a> forklarer hva
+      demoen inneholder og lenker videre til hver del.
+    </p>
+  </div>
+</section>
+{% endblock %}

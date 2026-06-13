@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% block title %}Pilot-resultat / Effekt — Loyalty AI{% endblock %}
+
+{% block content %}
+<style>
+  /* ---- Selvstendig styling for rapporten (rør ikke delt stylesheet) ----- */
+  .rap {
+    --ink: #16202b; --muted: #5a6b7b; --line: #e3e9ef;
+    --accent: #1565c0; --good: #2e7d32; --warn: #ef6c00; --bad: #c62828;
+    --card: #ffffff; --soft: #f5f8fb;
+    color: var(--ink); max-width: 980px; margin: 0 auto;
+  }
+  .rap-head { display:flex; justify-content:space-between; align-items:flex-start;
+    gap:1rem; flex-wrap:wrap; border-bottom:2px solid var(--ink); padding-bottom:.9rem; margin-bottom:1.4rem; }
+  .rap-kicker { letter-spacing:.14em; text-transform:uppercase; font-size:.72rem;
+    color:var(--accent); font-weight:700; margin:0 0 .25rem; }
+  .rap-head h1 { margin:.1rem 0; font-size:1.7rem; line-height:1.15; }
+  .rap-meta { color:var(--muted); font-size:.82rem; margin-top:.3rem; }
+  .rap-print-btn { background:var(--accent); color:#fff; border:0; border-radius:8px;
+    padding:.6rem .95rem; font-size:.9rem; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .rap-print-btn:hover { background:#0d4fa0; }
+
+  .rap-summary { background:var(--soft); border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:1.1rem 1.25rem; margin-bottom:1.6rem; }
+  .rap-summary h2 { margin:0 0 .5rem; font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
+  .rap-summary p { margin:.35rem 0; line-height:1.55; }
+  .rap-rec-chip { display:inline-block; background:var(--good); color:#fff; font-weight:700;
+    border-radius:6px; padding:.18rem .55rem; font-size:.82rem; letter-spacing:.04em; }
+
+  .rap-section-title { font-size:1.05rem; margin:1.8rem 0 .8rem; padding-bottom:.35rem;
+    border-bottom:1px solid var(--line); }
+  .est-note { font-size:.72rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.06em; }
+  .est-tag { display:inline-block; background:#fff3e0; color:var(--warn); border:1px solid #ffd9a8;
+    border-radius:5px; padding:.05rem .4rem; font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; vertical-align:middle; }
+
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1rem; }
+  .kpi { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:1.1rem 1.2rem;
+    box-shadow:0 1px 2px rgba(20,32,43,.04); }
+  .kpi-top { font-size:.74rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:600; margin-bottom:.45rem; }
+  .kpi-big { font-size:2.05rem; font-weight:800; line-height:1; color:var(--ink); }
+  .kpi-big .unit { font-size:1rem; font-weight:600; color:var(--muted); margin-left:.15rem; }
+  .kpi-sub { font-size:.8rem; color:var(--muted); margin-top:.45rem; line-height:1.35; }
+  .kpi.accent .kpi-big { color:var(--accent); }
+  .kpi.good .kpi-big { color:var(--good); }
+  .kpi.warn .kpi-big { color:var(--warn); }
+
+  .charts { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.1rem; }
+  .chart { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:1.1rem 1.2rem; }
+  .chart h3 { margin:0 0 .9rem; font-size:.92rem; }
+  .barrow { display:grid; grid-template-columns:120px 1fr 46px; align-items:center; gap:.6rem; margin:.45rem 0; }
+  .barlabel { font-size:.8rem; color:var(--ink); }
+  .bartrack { background:#eef2f6; border-radius:6px; height:16px; overflow:hidden; }
+  .barfill { height:100%; border-radius:6px; }
+  .barval { font-size:.8rem; font-weight:700; text-align:right; color:var(--muted); }
+  .c-good { background:var(--good); } .c-mid { background:var(--warn); } .c-bad { background:var(--bad); }
+  .c-accent { background:var(--accent); } .c-muted { background:#90a4ae; }
+
+  .donut-wrap { display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; }
+  .donut-legend { font-size:.82rem; }
+  .donut-legend li { list-style:none; margin:.25rem 0; display:flex; align-items:center; gap:.45rem; }
+  .swatch { width:11px; height:11px; border-radius:3px; display:inline-block; }
+
+  .catch { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:1.1rem 1.2rem; margin-bottom:1rem; }
+  .catch h3 { margin:0 0 .7rem; font-size:.95rem; display:flex; align-items:center; gap:.5rem; }
+  .catch ul { margin:0; padding:0; }
+  .catch li { list-style:none; border-bottom:1px dashed var(--line); padding:.55rem 0; }
+  .catch li:last-child { border-bottom:0; }
+  .catch a { color:var(--accent); font-weight:600; text-decoration:none; }
+  .catch a:hover { text-decoration:underline; }
+  .tag { display:inline-block; border-radius:5px; padding:.08rem .45rem; font-size:.7rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.04em; }
+  .tag-bad { background:#fdecea; color:var(--bad); } .tag-warn { background:#fff3e0; color:var(--warn); }
+  .flagline { font-size:.82rem; color:var(--muted); margin-top:.2rem; }
+
+  .rec { background:#f1f8f2; border:1px solid #cce7d0; border-left:4px solid var(--good); border-radius:10px;
+    padding:1.2rem 1.35rem; margin:1.6rem 0; }
+  .rec h2 { margin:0 0 .5rem; color:var(--good); font-size:1.15rem; }
+  .rec ol { margin:.6rem 0 0; padding-left:1.2rem; }
+  .rec li { margin:.35rem 0; line-height:1.45; }
+
+  .assump { font-size:.76rem; color:var(--muted); background:var(--soft); border:1px solid var(--line);
+    border-radius:8px; padding:.8rem 1rem; margin-top:1.4rem; line-height:1.5; }
+  .assump strong { color:var(--ink); }
+
+  /* ----------------------------- PRINT ----------------------------------- */
+  @media print {
+    .topbar, .provider-banner, .footer, .nav, .rap-print-btn, .rap-back { display:none !important; }
+    body, .content { background:#fff !important; }
+    .rap { max-width:100%; }
+    .kpi, .chart, .catch, .rap-summary, .rec { break-inside:avoid; box-shadow:none; }
+    .rap-section-title { break-after:avoid; }
+    a { color:var(--ink) !important; text-decoration:none; }
+    @page { margin:14mm; }
+  }
+</style>
+
+<div class="rap">
+
+  <div class="rap-head">
+    <div>
+      <p class="rap-kicker">Pilot-resultat · Dokumentert effekt</p>
+      <h1>AI-kvalitetssikring av kundesamtaler</h1>
+      <p class="rap-meta">
+        Loyalty · automatisk QA-pilot ·
+        analysert <strong>{{ total_calls }}</strong> samtaler ·
+        motor: STT <code>{{ banner.stt_backend }}</code> + LLM <code>{{ banner.llm_backend }}</code>
+      </p>
+    </div>
+    <button class="rap-print-btn" onclick="window.print()">🖨️ Skriv ut / lagre som PDF</button>
+  </div>
+
+  <!-- ============================ EXECUTIVE SUMMARY ===================== -->
+  <div class="rap-summary">
+    <h2>Sammendrag for ledelsen</h2>
+    <p>
+      Piloten kjørte automatisk QA på <strong>100&nbsp;%</strong> av samtalene
+      ({{ total_calls }} av {{ total_calls }}) — mot dagens manuelle stikkprøve på
+      anslagsvis <strong>~{{ estimates.manual_sample_pct }}&nbsp;%</strong>. Hver samtale fikk
+      QA-scorecard, sentiment, churn-risiko og compliance-flagg på sekunder.
+    </p>
+    <p>
+      AI-en fanget <strong>{{ high_churn }}</strong> samtale{{ '' if high_churn == 1 else 'r' }} med
+      <strong>høy churn-risiko</strong> som ville krevd oppfølging, og
+      <strong>{{ top_flags|length }}</strong> ulike compliance-avvik på tvers av porteføljen — funn
+      som dagens stikkprøve i praksis ikke ville sett.
+    </p>
+    <p>
+      <span class="rap-rec-chip">ANBEFALING: SKALER</span>
+      Effekten er reell og målbar. Vi anbefaler å utvide piloten til flere team/kontoer
+      og koble QA-resultatene direkte inn i coaching og CRM.
+    </p>
+  </div>
+
+  <!-- ============================ NØKKELTALL ============================ -->
+  <h2 class="rap-section-title">Nøkkeltall</h2>
+  <div class="kpis">
+    <div class="kpi accent">
+      <div class="kpi-top">QA-dekning</div>
+      <div class="kpi-big">100<span class="unit">%</span></div>
+      <div class="kpi-sub">Alle {{ total_calls }} samtaler QA-vurdert automatisk —
+        mot ~{{ estimates.manual_sample_pct }}&nbsp;% manuell stikkprøve i dag.</div>
+    </div>
+
+    <div class="kpi good">
+      <div class="kpi-top">Estimert tid spart <span class="est-tag">estimat</span></div>
+      <div class="kpi-big">{{ '{:,}'.format(estimates.full_manual_hours_year).replace(',', ' ') }}<span class="unit">t/år</span></div>
+      <div class="kpi-sub">≈ <strong>{{ estimates.full_manual_fte }} årsverk</strong> i manuelt QA-arbeid
+        som AI-en dekker, ved {{ '{:,}'.format(estimates.assumed_monthly_volume).replace(',', ' ') }} samtaler/mnd
+        og ~{{ estimates.manual_qa_minutes }} min manuell QA/samtale.</div>
+    </div>
+
+    <div class="kpi warn">
+      <div class="kpi-top">Høy churn fanget tidlig</div>
+      <div class="kpi-big">{{ high_churn }}</div>
+      <div class="kpi-sub">{{ high_churn_share }}&nbsp;% av samtalene flagget med høy churn-risiko —
+        klare for proaktiv retention.</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-top">Snitt QA-score</div>
+      <div class="kpi-big">{{ avg_qa }}<span class="unit">%</span></div>
+      <div class="kpi-sub">Snitt manus-/compliance-etterlevelse på tvers av porteføljen.</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-top">Snitt sentiment</div>
+      <div class="kpi-big" style="text-transform:capitalize;">{{ dominant_sentiment }}</div>
+      <div class="kpi-sub">{{ positive_share }}&nbsp;% positiv · {{ negative_share }}&nbsp;% negativ —
+        kontinuerlig stemningsmåling, ikke gjetting.</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-top">Compliance-avvik fanget</div>
+      <div class="kpi-big">{{ total_flags }}</div>
+      <div class="kpi-sub">{{ top_flags|length }} ulike avvikstyper — automatisk loggført per samtale.</div>
+    </div>
+  </div>
+
+  <!-- ============================ GRAFER =============================== -->
+  <h2 class="rap-section-title">Fordelinger</h2>
+  <div class="charts">
+
+    <!-- QA-fordeling (søyler) -->
+    <div class="chart">
+      <h3>QA-score-fordeling</h3>
+      {% for b in qa_bands %}
+      <div class="barrow">
+        <span class="barlabel">{{ b.label }}</span>
+        <span class="bartrack">
+          <span class="barfill {{ 'c-good' if b.key=='strong' else ('c-mid' if b.key=='mid' else 'c-bad') }}"
+                style="width: {{ b.percent }}%;"></span>
+        </span>
+        <span class="barval">{{ b.count }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Sentiment (donut SVG) -->
+    <div class="chart">
+      <h3>Sentiment-fordeling</h3>
+      <div class="donut-wrap">
+        {% set sol = {'positiv':'#2e7d32','nøytral':'#90a4ae','negativ':'#c62828'} %}
+        <svg width="118" height="118" viewBox="0 0 42 42" role="img" aria-label="Sentiment-fordeling">
+          <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#eef2f6" stroke-width="6"></circle>
+          {% set ns = namespace(off=25) %}
+          {% for d in sentiment_dist %}
+            {% if d.percent > 0 %}
+            <circle cx="21" cy="21" r="15.9155" fill="none"
+                    stroke="{{ sol[d.label] }}" stroke-width="6"
+                    stroke-dasharray="{{ d.percent }} {{ 100 - d.percent }}"
+                    stroke-dashoffset="{{ ns.off }}"></circle>
+            {% set ns.off = ns.off - d.percent %}
+            {% endif %}
+          {% endfor %}
+        </svg>
+        <ul class="donut-legend">
+          {% for d in sentiment_dist %}
+          <li><span class="swatch" style="background:{{ sol[d.label] }}"></span>
+            <span style="text-transform:capitalize;">{{ d.label }}</span>
+            — <strong>{{ d.count }}</strong> ({{ d.percent }}&nbsp;%)</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Churn-risiko (søyler) -->
+    <div class="chart">
+      <h3>Churn-risiko</h3>
+      {% for d in churn_dist %}
+      <div class="barrow">
+        <span class="barlabel" style="text-transform:capitalize;">{{ d.label }}</span>
+        <span class="bartrack">
+          <span class="barfill {{ 'c-good' if d.label=='lav' else ('c-mid' if d.label=='middels' else 'c-bad') }}"
+                style="width: {{ d.percent }}%;"></span>
+        </span>
+        <span class="barval">{{ d.count }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <!-- ============================ HVA AI-EN FANGET ===================== -->
+  <h2 class="rap-section-title">Hva AI-en fanget</h2>
+
+  {% if churn_catches %}
+  <div class="catch">
+    <h3>🚨 Churn-varsler — kunder i faresonen, fanget tidlig</h3>
+    <ul>
+      {% for c in churn_catches %}
+      <li>
+        <a href="/call/{{ c.name }}">{{ c.title }}</a>
+        <span class="tag tag-bad">høy churn</span>
+        <div class="flagline">{{ c.call_reason }} · sentiment: {{ c.sentiment }}</div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% if compliance_catches %}
+  <div class="catch">
+    <h3>⚖️ Compliance-flagg — avvik AI-en loggførte per samtale</h3>
+    <ul>
+      {% for c in compliance_catches %}
+      <li>
+        <a href="/call/{{ c.name }}">{{ c.title }}</a>
+        <span class="tag tag-warn">{{ c.flags|length }} flagg</span>
+        · QA {{ c.qa_percent }}&nbsp;%
+        <div class="flagline">{{ c.flags|join(' · ') }}</div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% if not churn_catches and not compliance_catches %}
+  <div class="catch"><p style="margin:0;color:var(--muted);">
+    Ingen churn- eller compliance-avvik i dette utvalget — alle samtaler innenfor standard.
+  </p></div>
+  {% endif %}
+
+  <!-- ============================ ANBEFALING ========================== -->
+  <div class="rec">
+    <h2>✅ Anbefaling: SKALER</h2>
+    <p style="margin:0;">
+      Piloten viser dokumentert effekt: full QA-dekning, churn fanget tidlig og compliance
+      loggført automatisk — uten å øke bemanningen. Neste steg:
+    </p>
+    <ol>
+      <li>Utvid fra pilotutvalget til <strong>ett komplett team/én konto</strong> i full drift.</li>
+      <li>Koble QA-score og coaching-tips direkte inn i <strong>agent-oppfølging</strong> (ukentlig).</li>
+      <li>Rute høy-churn-flagg automatisk til <strong>retention/proaktiv kontakt</strong>.</li>
+      <li>Eksporter compliance-flagg til <strong>CRM/sak</strong> for sporbar lukking.</li>
+      <li>Rull deretter ut til <strong>flere kontoer/team</strong> og sett mål på QA-snitt + churn-rate.</li>
+    </ol>
+  </div>
+
+  <!-- ============================ FORUTSETNINGER ====================== -->
+  <p class="assump">
+    <strong>Om tallene.</strong> QA-dekning, antall churn-varsler, compliance-flagg, snitt-QA og
+    sentiment er <strong>faktiske resultater</strong> fra AI-analysen av de {{ total_calls }}
+    pilot-samtalene. <span class="est-tag">estimat</span>-merkede tall (tid spart / årsverk) er
+    <strong>ESTIMATER</strong> basert på forutsetningene:
+    ~{{ estimates.manual_qa_minutes }} min manuell QA per samtale,
+    {{ '{:,}'.format(estimates.assumed_monthly_volume).replace(',', ' ') }} samtaler/mnd,
+    {{ '{:,}'.format(estimates.hours_per_fte_year).replace(',', ' ') }} t per årsverk/år,
+    og dagens manuelle stikkprøve på ~{{ estimates.manual_sample_pct }}&nbsp;%.
+    Juster forutsetningene mot Loyaltys faktiske volum for en endelig business-case.
+  </p>
+
+</div>
+{% endblock %}

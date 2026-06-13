@@ -4,11 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}Loyalty AI — Call-senter{% endblock %}</title>
+  <meta name="theme-color" content="#0b0f17" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   {% set b = banner %}
+  {% set path = request.url.path %}
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="/">
@@ -17,19 +19,44 @@
         <span class="brand-sub">Call-senter</span>
       </a>
 
-      <nav class="nav">
-        <a class="nav-link {{ 'is-active' if request.url.path == '/' else '' }}" href="/">
-          <span class="nav-ico">🏠</span> Forside
+      <nav class="nav" aria-label="Hovedmeny">
+        <a class="nav-link {{ 'is-active' if path == '/' else '' }}" href="/">
+          <span class="nav-ico" aria-hidden="true">🏠</span> Forside
         </a>
-        <a class="nav-link {{ 'is-active' if request.url.path.startswith('/live') else '' }}" href="/live">
-          <span class="nav-ico">🎙️</span> Live
+        <a class="nav-link {{ 'is-active' if path.startswith('/live') else '' }}" href="/live">
+          <span class="nav-ico" aria-hidden="true">🎙️</span> Live
         </a>
-        <a class="nav-link {{ 'is-active' if request.url.path.startswith('/dashboard') else '' }}" href="/dashboard">
-          <span class="nav-ico">📊</span> Dashboard
+        <a class="nav-link {{ 'is-active' if path.startswith('/operations') else '' }}" href="/operations">
+          <span class="nav-ico" aria-hidden="true">🛠️</span> Drift
         </a>
-        <a class="nav-link {{ 'is-active' if request.url.path.startswith('/eval') else '' }}" href="/eval">
-          <span class="nav-ico">⚡</span> Effekt
+        <a class="nav-link {{ 'is-active' if path.startswith('/dashboard') else '' }}" href="/dashboard">
+          <span class="nav-ico" aria-hidden="true">📊</span> Dashboard
         </a>
+        <a class="nav-link {{ 'is-active' if path.startswith('/eval') else '' }}" href="/eval">
+          <span class="nav-ico" aria-hidden="true">⚡</span> Effekt
+        </a>
+        <a class="nav-link {{ 'is-active' if path.startswith('/rapport') else '' }}" href="/rapport">
+          <span class="nav-ico" aria-hidden="true">📄</span> Rapport
+        </a>
+
+        {% set in_more = path.startswith('/stt') or path.startswith('/personvern') or path.startswith('/redaction') or path.startswith('/agent-assist') or path.startswith('/guide') %}
+        <details class="nav-more {{ 'is-active' if in_more else '' }}">
+          <summary class="nav-link nav-more-toggle">Mer <span class="nav-caret" aria-hidden="true">▾</span></summary>
+          <div class="nav-menu" role="menu">
+            <a class="nav-menu-link {{ 'is-active' if path.startswith('/stt') else '' }}" href="/stt" role="menuitem">
+              <span class="nav-ico" aria-hidden="true">🎧</span> STT-valg
+            </a>
+            <a class="nav-menu-link {{ 'is-active' if (path.startswith('/personvern') or path.startswith('/redaction')) else '' }}" href="/personvern" role="menuitem">
+              <span class="nav-ico" aria-hidden="true">🔒</span> Personvern
+            </a>
+            <a class="nav-menu-link {{ 'is-active' if path.startswith('/agent-assist') else '' }}" href="/agent-assist" role="menuitem">
+              <span class="nav-ico" aria-hidden="true">🤝</span> Agent-assist
+            </a>
+            <a class="nav-menu-link {{ 'is-active' if path.startswith('/guide') else '' }}" href="/guide" role="menuitem">
+              <span class="nav-ico" aria-hidden="true">📘</span> Guide
+            </a>
+          </div>
+        </details>
       </nav>
 
       <div class="deploy-chip {{ 'is-azure' if b.is_azure else 'is-local' }}"
@@ -44,7 +71,7 @@
   <div class="provider-banner {{ 'is-azure' if b.is_azure else 'is-local' }}">
     <div class="provider-inner">
       <div class="banner-row">
-        <span class="pill pill-target">DEPLOY_TARGET = <strong>{{ b.deploy_target | upper }}</strong></span>
+        <span class="pill pill-target"><span class="pill-key">Deploy</span> <strong>{{ b.deploy_target | upper }}</strong></span>
         <span class="pill"><span class="pill-key">STT</span> <strong>{{ b.stt_backend }}</strong></span>
         <span class="pill"><span class="pill-key">LLM</span> <strong>{{ b.llm_backend }}</strong></span>
       </div>
@@ -59,8 +86,11 @@
   </main>
 
   <footer class="footer">
-    <span>Loyalty AI · call-senter-demo</span>
-    <span class="footer-note">Demo — ingen auth/PII-maskering. Se README «produksjon» for hvor sikkerhet hører hjemme.</span>
+    <div class="footer-brand">
+      <span class="brand-mark" aria-hidden="true">◆</span>
+      <span>Loyalty&nbsp;AI · call-senter-demo</span>
+    </div>
+    <span class="footer-note">Demo — ingen auth/PII-maskering i UI. Se README «produksjon» for hvor sikkerhet hører hjemme.</span>
   </footer>
 </body>
 </html>

@@ -1,0 +1,24 @@
+{
+  "name": "bank_mistenkelig",
+  "call_type": "kundeservice",
+  "title": "Mistenkelig aktivitet — ID-verifisering og kortsperring (utgående)",
+  "turns": [
+    { "speaker": "agent", "text": "God dag, du snakker med Marius fra Nordbanken svindelavdeling. Av sikkerhetsgrunner må jeg verifisere identiteten din før vi snakker videre. Snakker jeg med Oddvar Hansen?" },
+    { "speaker": "kunde", "text": "Ja, det er meg. Hva gjelder dette?" },
+    { "speaker": "agent", "text": "Jeg ringer fordi vi har registrert mistenkelig aktivitet på kortet ditt. Men før jeg sier noe mer, må jeg bekrefte at det faktisk er deg. Jeg kommer ikke til å be om passord, PIN-kode eller BankID-koder. Kan du bekrefte de fire siste sifrene i fødselsnummeret ditt?" },
+    { "speaker": "kunde", "text": "Ja, det er 4 9 0 3." },
+    { "speaker": "agent", "text": "Takk. Kan du også bekrefte hvilken by du er folkeregistrert i?" },
+    { "speaker": "kunde", "text": "Det er Bergen." },
+    { "speaker": "agent", "text": "Flott, da er identiteten din bekreftet. Grunnen til at jeg ringer er at vi har sett to forsøk på kjøp i utlandet i natt, ett på 8 400 kroner fra en nettbutikk i Romania, og ett på 320 kroner. Har du gjort disse kjøpene?" },
+    { "speaker": "kunde", "text": "Nei, absolutt ikke. Jeg har ikke vært utenfor Bergen på flere uker." },
+    { "speaker": "agent", "text": "Da har vi gjort rett i å stoppe dem. Begge transaksjonene er allerede blokkert, så du har ikke tapt penger. For å sikre kontoen din anbefaler jeg at vi sperrer det nåværende kortet og bestiller et nytt. Samtykker du til at jeg sperrer kortet nå?" },
+    { "speaker": "kunde", "text": "Ja, det er greit. Men hvordan kan jeg være sikker på at du faktisk er fra banken og ikke en svindler selv?" },
+    { "speaker": "agent", "text": "Det er et veldig klokt spørsmål, og jeg er glad du stiller det. Du skal aldri oppgi koder til noen som ringer deg. Du kan trygt legge på, ringe banken på det offisielle nummeret bak på kortet ditt, og be om svindelavdelingen. Saksnummeret er 55-2031." },
+    { "speaker": "kunde", "text": "Det setter jeg pris på. Men jeg stoler på deg så langt, du har ikke bedt om noe sånt. Sperr kortet." },
+    { "speaker": "agent", "text": "Takk for tilliten. Kortet er nå sperret, og et nytt kort sendes til din folkeregistrerte adresse innen fem virkedager. I mellomtiden kan du betale med mobil i appen." },
+    { "speaker": "kunde", "text": "Bra. Trenger jeg å gjøre noe mer?" },
+    { "speaker": "agent", "text": "Jeg anbefaler at du sjekker kontoutskriften de neste dagene og melder fra om du ser noe ukjent. Jeg har også registrert en svindelsak på din konto, så du er ekstra overvåket fremover. Var det noe annet?" },
+    { "speaker": "kunde", "text": "Nei, det holder. Takk for at dere fanget opp dette." },
+    { "speaker": "agent", "text": "Bare hyggelig, Oddvar. Du gjorde alt riktig ved å være kritisk. Ha en trygg dag videre." }
+  ]
+}

@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% block title %}Personvern & ansvarlig AI — Loyalty call-senter{% endblock %}
+{% block content %}
+
+<style>
+  /* Scoped til personvern-siden — egen lane, ingen deling med andre maler. */
+  .pv-wrap { max-width: 72ch; margin: 0 auto; }
+  .pv-eyebrow {
+    text-transform: uppercase; letter-spacing: .12em; font-size: .72rem;
+    font-weight: 700; color: #6b7686; margin-bottom: .35rem;
+  }
+  .pv-hero-lead { color: #424b59; font-size: 1.05rem; line-height: 1.6; }
+  .pv-hero-lead strong { color: #1a1f2b; }
+
+  .pv-section { margin: 2.4rem 0; }
+  .pv-section > h2 {
+    font-size: 1.18rem; margin: 0 0 .2rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .pv-section > h2 .pv-ico { font-size: 1.05rem; opacity: .85; }
+  .pv-section > .pv-sub { color: #6b7686; margin: 0 0 1rem; font-size: .94rem; }
+
+  .pv-card {
+    border: 1px solid #e3e7ee; border-radius: 12px; padding: 1.1rem 1.25rem;
+    background: #fbfcfe;
+  }
+  .pv-card + .pv-card { margin-top: .9rem; }
+
+  /* Live PII før/etter */
+  .pv-cols { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+  @media (max-width: 640px) { .pv-cols { grid-template-columns: 1fr; } }
+  .pv-box {
+    border: 1px solid #e3e7ee; border-radius: 10px; padding: .85rem 1rem;
+    background: #fff; white-space: pre-wrap; word-break: break-word;
+    font-size: .9rem; line-height: 1.55; color: #2b3240;
+  }
+  .pv-box.is-masked { background: #f1f8f2; border-color: #cbe3cd; }
+  .pv-box-label {
+    font-weight: 700; font-size: .76rem; text-transform: uppercase;
+    letter-spacing: .06em; color: #6b7686; margin-bottom: .4rem;
+  }
+  .pv-box .ph {
+    background: #1f6f3a; color: #fff; border-radius: 4px;
+    padding: .02rem .3rem; font-size: .82rem; font-weight: 600;
+  }
+  .pv-table { border-collapse: collapse; width: 100%; margin-top: 1rem; font-size: .9rem; }
+  .pv-table th, .pv-table td {
+    text-align: left; padding: .45rem .6rem; border-bottom: 1px solid #edf0f5;
+    vertical-align: top;
+  }
+  .pv-table th { color: #6b7686; font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; }
+  .pv-tag {
+    background: #1a1f2b; color: #fff; border-radius: 4px;
+    padding: .08rem .42rem; font-size: .74rem; font-weight: 600; letter-spacing: .02em;
+  }
+  .pv-table code, .pv-box code { background: #eef1f6; padding: .05rem .3rem; border-radius: 4px; }
+
+  /* Databehandlings-matrise */
+  .pv-data-table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  .pv-data-table th, .pv-data-table td {
+    text-align: left; padding: .6rem .7rem; border-bottom: 1px solid #edf0f5; vertical-align: top;
+  }
+  .pv-data-table th { color: #6b7686; font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; }
+  .pv-data-table tr.is-active td { background: #f3f8ff; }
+  .pv-vei { font-weight: 700; color: #1a1f2b; }
+  .pv-vei-deploy { display: block; font-weight: 400; color: #8a93a3; font-size: .76rem; margin-top: .12rem; }
+  .pv-now {
+    display: inline-block; margin-left: .4rem; font-size: .66rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .04em; color: #1e5fb0;
+    background: #e3eefc; border-radius: 999px; padding: .04rem .42rem; vertical-align: middle;
+  }
+  .pv-fit {
+    display: inline-block; font-size: .76rem; font-weight: 700; border-radius: 999px;
+    padding: .12rem .5rem; white-space: nowrap;
+  }
+  .pv-fit.fit-hoy { background: #e3f4e6; color: #1f6f3a; }
+  .pv-fit.fit-lav { background: #fbe6e6; color: #a32a2a; }
+  .pv-fit-note { display: block; color: #6b7686; font-size: .8rem; margin-top: .25rem; }
+
+  /* Prinsipp-grid (menneske-i-loop, sporbarhet, samtykke, transparens) */
+  .pv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+  @media (max-width: 640px) { .pv-grid { grid-template-columns: 1fr; } }
+  .pv-grid .pv-card h3 {
+    margin: 0 0 .35rem; font-size: 1rem;
+    display: flex; align-items: center; gap: .45rem;
+  }
+  .pv-grid .pv-card p { margin: 0; color: #424b59; font-size: .92rem; line-height: 1.55; }
+  .pv-card ul { margin: .5rem 0 0; padding-left: 1.1rem; color: #424b59; font-size: .9rem; line-height: 1.5; }
+  .pv-card li { margin: .18rem 0; }
+
+  /* Forslag vs handling */
+  .pv-split { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+  @media (max-width: 640px) { .pv-split { grid-template-columns: 1fr; } }
+  .pv-split .pv-half { border: 1px solid #e3e7ee; border-radius: 10px; padding: .85rem 1rem; }
+  .pv-half.is-suggest { background: #f6f8fc; }
+  .pv-half.is-action { background: #fffaf2; border-color: #f0e2c8; }
+  .pv-half .pv-half-head {
+    font-weight: 700; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em;
+    margin-bottom: .4rem; display: flex; align-items: center; gap: .4rem;
+  }
+  .pv-half.is-suggest .pv-half-head { color: #3a5ea8; }
+  .pv-half.is-action .pv-half-head { color: #9a6a18; }
+  .pv-half p { margin: 0; font-size: .9rem; color: #424b59; line-height: 1.55; }
+
+  .pv-inline-link { color: #1e5fb0; font-weight: 600; text-decoration: none; }
+  .pv-inline-link:hover { text-decoration: underline; }
+  .pv-foot-note { color: #8a93a3; font-size: .82rem; margin-top: 2.5rem; line-height: 1.6; }
+</style>
+
+<div class="pv-wrap">
+
+  <p><a class="back" href="/">&larr; Alle samtaler</a></p>
+
+  <div class="pv-eyebrow">Tillit · Ansvarlig AI</div>
+  <h1>Personvern &amp; ansvarlig AI</h1>
+  <p class="pv-hero-lead">
+    Samtaleopptak er <strong>sensitive persondata</strong>. Før Loyalty lar en
+    AI ta i bruk ekte kundedata, må IT og ledelse vite hvor dataene ligger, hvem
+    som ser hva, og hvordan mennesket beholder kontrollen. Denne siden samler
+    svarene — og viser PII-maskeringen live.
+  </p>
+
+  <!-- 1. PII-maskering ------------------------------------------------------ -->
+  <section class="pv-section">
+    <h2><span class="pv-ico" aria-hidden="true">🛡️</span> PII-maskering</h2>
+    <p class="pv-sub">
+      Direkte identifikatorer (fødselsnummer, telefon, e-post, konto-/kortnummer,
+      navn) maskeres deterministisk <em>før</em> et transkript logges, sendes til
+      LLM-analyse eller eksporteres til CRM. Ingen eksterne kall — ren regex.
+    </p>
+
+    <div class="pv-card">
+      <div class="pv-cols">
+        <div>
+          <div class="pv-box-label">Før — rå tekst</div>
+          <div class="pv-box">{{ pii_original }}</div>
+        </div>
+        <div>
+          <div class="pv-box-label">Etter — maskert</div>
+          <div class="pv-box is-masked">{{ pii_masked }}</div>
+        </div>
+      </div>
+
+      <table class="pv-table">
+        <thead>
+          <tr><th>Type</th><th>Treff (delvis maskert)</th><th>Posisjon</th></tr>
+        </thead>
+        <tbody>
+          {% for f in pii_funn %}
+          <tr>
+            <td><span class="pv-tag">{{ f.type }}</span></td>
+            <td><code>{{ f.original_maskert }}</code></td>
+            <td>{{ f.posisjon[0] }}&ndash;{{ f.posisjon[1] }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3"><em>Ingen PII funnet i eksempelet.</em></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <p style="margin:.9rem 0 0; color:#6b7686; font-size:.86rem;">
+        Funn-listen viser <strong>kun delvis-maskerte</strong> treff (f.eks.
+        <code>01&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;45</code>), aldri full PII —
+        så en revisor kan verifisere uten ny eksponering.
+        Prøv på egne utdrag på <a class="pv-inline-link" href="/redaction">/redaction</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- 2. Databehandling ----------------------------------------------------- -->
+  <section class="pv-section">
+    <h2><span class="pv-ico" aria-hidden="true">🌍</span> Databehandling — hvor ligger dataene?</h2>
+    <p class="pv-sub">
+      Samme kode kjører lokalt eller i sky. Én variabel — <code>DEPLOY_TARGET</code>
+      — styrer HVOR samtaledataene faktisk behandles. Det avgjør egnetheten for
+      ekte kundedata.
+    </p>
+
+    <div class="pv-card" style="padding:0; overflow:hidden;">
+      <table class="pv-data-table">
+        <thead>
+          <tr>
+            <th>Vei</th>
+            <th>Tale-til-tekst / LLM</th>
+            <th>Hvor data ligger</th>
+            <th>Egnethet for ekte kundedata</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in data_veier %}
+          <tr class="{{ 'is-active' if v.deploy == aktiv_vei else '' }}">
+            <td>
+              <span class="pv-vei">{{ v.vei }}</span>
+              {% if v.deploy == aktiv_vei %}<span class="pv-now">Nå</span>{% endif %}
+              <span class="pv-vei-deploy">DEPLOY_TARGET={{ v.deploy }}</span>
+            </td>
+            <td>
+              {{ v.stt }}<br>
+              <span style="color:#8a93a3; font-size:.82rem;">{{ v.llm }}</span>
+            </td>
+            <td>
+              {{ v.hvor }}<br>
+              <span style="color:#8a93a3; font-size:.82rem;">{{ v.jurisdiksjon }}</span>
+            </td>
+            <td>
+              <span class="pv-fit fit-{{ v.egnethet }}">
+                {{ 'Egnet' if v.egnethet == 'hoy' else 'Frarådet' }}
+              </span>
+              <span class="pv-fit-note">{{ v.egnethet_tekst }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 3. Prinsipper: menneske-i-loop, sporbarhet, samtykke/DPA -------------- -->
+  <section class="pv-section">
+    <h2><span class="pv-ico" aria-hidden="true">⚖️</span> Slik beholder mennesket kontrollen</h2>
+    <p class="pv-sub">
+      AI-en er et hjelpemiddel, ikke en beslutningstaker. Fire bærebjelker gjør
+      bruken forsvarlig og etterprøvbar.
+    </p>
+
+    <div class="pv-grid">
+      <div class="pv-card">
+        <h3><span aria-hidden="true">🤝</span> Menneske-i-loop</h3>
+        <p>
+          AI lager utkast og forslag — sammendrag, foreslåtte svar, neste steg.
+          Alt kundevendt godkjennes av et menneske før det sendes. Ingen
+          automatisk handling mot kunde uten godkjenning.
+        </p>
+      </div>
+
+      <div class="pv-card">
+        <h3><span aria-hidden="true">🧾</span> Sporbarhet</h3>
+        <p>Audit-logg gjør bruken etterprøvbar:</p>
+        <ul>
+          <li>Hvem så hvilket transkript, og når</li>
+          <li>Hvilken AI-analyse ble kjørt, med hvilken modell</li>
+          <li>Hva et menneske godkjente eller endret</li>
+        </ul>
+      </div>
+
+      <div class="pv-card">
+        <h3><span aria-hidden="true">📝</span> Samtykke &amp; DPA</h3>
+        <p>Før ekte kundedata tas i bruk:</p>
+        <ul>
+          <li>Signert databehandleravtale (DPA) med hver underleverandør</li>
+          <li>Behandlingsgrunnlag og kundeinformasjon på plass</li>
+          <li>Definert retention — sletting etter avtalt tid, på forespørsel</li>
+        </ul>
+      </div>
+
+      <div class="pv-card">
+        <h3><span aria-hidden="true">🔍</span> AI-transparens</h3>
+        <p>
+          Det skal alltid være tydelig at innholdet er AI-generert, og
+          forslag holdes adskilt fra faktisk handling — så ingen forveksler et
+          utkast med en utført beslutning.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Forslag vs handling ----------------------------------------------- -->
+  <section class="pv-section">
+    <h2><span class="pv-ico" aria-hidden="true">🚦</span> Forslag vs. handling — tydelig adskilt</h2>
+    <p class="pv-sub">
+      AI-ens output er <em>alltid</em> et forslag. Handlingen tilhører mennesket.
+    </p>
+
+    <div class="pv-split">
+      <div class="pv-half is-suggest">
+        <div class="pv-half-head"><span aria-hidden="true">💡</span> AI foreslår</div>
+        <p>
+          Transkripsjon, sammendrag, sentiment, QA-score, foreslått svar og
+          neste steg. Presentert som utkast til vurdering — aldri som et
+          ferdig vedtak.
+        </p>
+      </div>
+      <div class="pv-half is-action">
+        <div class="pv-half-head"><span aria-hidden="true">✅</span> Mennesket handler</div>
+        <p>
+          Agenten leser forslaget, retter ved behov og godkjenner. Først da går
+          noe ut til kunden eller inn i CRM. Beslutningen — og ansvaret —
+          forblir hos mennesket.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <p class="pv-foot-note">
+    Denne demoen kjører med syntetiske data og uten innlogging. PII-maskering,
+    audit-logg, kryptering, samtykkehåndtering og DPA hører hjemme i en
+    produksjonsoppsett før ekte kundedata behandles — denne siden viser
+    <em>hvor</em> hver del passer inn.
+  </p>
+
+</div>
+{% endblock %}

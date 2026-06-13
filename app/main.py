@@ -104,3 +104,12 @@ def reanalyze(name: str) -> dict:
 @app.get("/healthz")
 def healthz() -> dict:
     return {"status": "ok", **_provider_banner()}
+
+
+# Pen 404-side for ukjente GET-stier (registreres SIST → lavest prioritet, så den
+# kun fanger ekte rute-bom; API-endepunkter beholder sine egne JSON-404 i handlerne).
+@app.get("/{full_path:path}", include_in_schema=False)
+def not_found(request: Request, full_path: str) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request, "404.html", {"banner": _provider_banner()}, status_code=404
+    )

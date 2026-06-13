@@ -1,0 +1,24 @@
+{
+  "name": "teleselskap_mersalg",
+  "call_type": "kundeservice",
+  "title": "Kundeservice som blir mersalg — mobiloppgradering (innkommende)",
+  "turns": [
+    { "speaker": "agent", "text": "Hei, du har kommet til Nordtel kundeservice, mitt navn er Aisha. Hvem snakker jeg med?" },
+    { "speaker": "kunde", "text": "Hei, dette er Geir Andersen. Jeg lurer på hvorfor mobilen min plutselig er så treg på nett." },
+    { "speaker": "agent", "text": "Det skal vi finne ut av, Geir. Kan du bekrefte telefonnummeret som er knyttet til abonnementet?" },
+    { "speaker": "kunde", "text": "Ja, det er 412 33 221." },
+    { "speaker": "agent", "text": "Takk, da ser jeg abonnementet ditt her. Jeg ser at du har brukt opp 9 av 10 gigabyte denne måneden, og etter det settes hastigheten ned. Det er nok derfor det føles tregt." },
+    { "speaker": "kunde", "text": "Å, det visste jeg ikke. Jeg har begynt å streame mye mer musikk og podkast på jobbreiser i det siste." },
+    { "speaker": "agent", "text": "Det forklarer det. Hvor ofte vil du si at du opplever at dataen tar slutt før måneden er omme?" },
+    { "speaker": "kunde", "text": "Egentlig de siste tre månedene på rad. Det er ganske irriterende." },
+    { "speaker": "agent", "text": "Da har jeg en løsning som passer bruken din bedre. Vi har et abonnement med 50 gigabyte til 349 kroner i måneden, altså bare 50 kroner mer enn du betaler i dag, og da slipper du å tenke på at det tar slutt." },
+    { "speaker": "kunde", "text": "Bare 50 kroner mer for fem ganger så mye? Det høres jo nesten for bra ut." },
+    { "speaker": "agent", "text": "Det er en lojalitetspris fordi du har vært kunde i over tre år. Du får også fri bruk i hele Norden uten ekstra kostnad, noe som er greit på de jobbreisene." },
+    { "speaker": "kunde", "text": "Ja, det vil jeg gjerne ha. Kan du bare bytte det for meg?" },
+    { "speaker": "agent", "text": "Veldig gjerne. For å aktivere endringen trenger jeg ditt samtykke til at det nye abonnementet gjelder fra neste fakturaperiode. Bekrefter du det?" },
+    { "speaker": "kunde", "text": "Ja, det bekrefter jeg." },
+    { "speaker": "agent", "text": "Supert, da er det endret. Du får en bekreftelse på SMS innen et par minutter, og den nye dataen er tilgjengelig med en gang. Var det noe annet jeg kan hjelpe deg med?" },
+    { "speaker": "kunde", "text": "Nei, det var alt. Tusen takk for hjelpen!" },
+    { "speaker": "agent", "text": "Bare hyggelig, Geir. Ha en strålende dag videre!" }
+  ]
+}

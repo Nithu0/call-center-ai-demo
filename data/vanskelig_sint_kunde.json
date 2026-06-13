@@ -1,0 +1,25 @@
+{
+  "name": "vanskelig_sint_kunde",
+  "call_type": "kundeservice",
+  "title": "Svært sint kunde — feil pakkelevering, dårlig håndtert (innkommende)",
+  "turns": [
+    { "speaker": "kunde", "text": "Endelig svar! Jeg har sittet i kø i 40 minutter. Dette er helt uakseptabelt!" },
+    { "speaker": "agent", "text": "Ja, hva gjelder det?" },
+    { "speaker": "kunde", "text": "Pakken min skulle kommet for ti dager siden! Jeg har betalt for ekspresslevering og dere har rotet det fullstendig til!" },
+    { "speaker": "agent", "text": "Okei. Du må gi meg ordrenummeret ditt før jeg kan gjøre noe." },
+    { "speaker": "kunde", "text": "Det er 88421. Og dette er andre gang jeg ringer om det samme!" },
+    { "speaker": "agent", "text": "Jeg ser ordren her. Den står som sendt, så da er den vel på vei." },
+    { "speaker": "kunde", "text": "På vei? Den har stått som sendt i ti dager! Skjønner du ikke at det er noe galt?" },
+    { "speaker": "agent", "text": "Det er nok bare forsinkelser hos transportøren. Det er ikke vårt ansvar egentlig." },
+    { "speaker": "kunde", "text": "Ikke deres ansvar? Jeg kjøpte den hos dere! Jeg vil snakke med en leder!" },
+    { "speaker": "agent", "text": "Det er ingen leder tilgjengelig nå. Du må bare vente og se om den kommer." },
+    { "speaker": "kunde", "text": "Det er helt latterlig. Kan dere ikke i det minste sende en ny eller gi meg pengene tilbake?" },
+    { "speaker": "agent", "text": "Refusjon kan jeg ikke gjøre før pakken er registrert som tapt, og det tar tretti dager." },
+    { "speaker": "kunde", "text": "Tretti dager til?! Dette er den verste kundeservicen jeg noen gang har opplevd!" },
+    { "speaker": "agent", "text": "Jeg gjør bare jobben min. Det er reglene." },
+    { "speaker": "kunde", "text": "Jeg kommer til å klage på dere og aldri handle her igjen!" },
+    { "speaker": "agent", "text": "Det er opp til deg. Var det noe annet?" },
+    { "speaker": "kunde", "text": "Nei! Bare glem det!" },
+    { "speaker": "agent", "text": "Ok. Ha det." }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "stromselskap_oppsigelse",
+  "call_type": "kundeservice",
+  "title": "Oppsigelse — kunde vil bytte strømleverandør (retention)",
+  "turns": [
+    { "speaker": "agent", "text": "Hei og velkommen til Fjellkraft, du snakker med Henrik. Hvem har jeg gleden av å snakke med?" },
+    { "speaker": "kunde", "text": "Hei, jeg heter Mona Lervik. Jeg ringer for å si opp strømavtalen min." },
+    { "speaker": "agent", "text": "Det er trist å høre, Mona. La meg bare bekrefte at jeg har riktig kunde. Kan du oppgi kundenummer eller fødselsdato?" },
+    { "speaker": "kunde", "text": "Fødselsdato er 14.06.88." },
+    { "speaker": "agent", "text": "Takk, da har jeg deg her. Får jeg lov å spørre hva som er grunnen til at du vil bytte?" },
+    { "speaker": "kunde", "text": "Ærlig talt, jeg synes regningene har blitt altfor høye. Naboen min betaler mye mindre hos Strømstad Energi." },
+    { "speaker": "agent", "text": "Jeg skjønner at det føles frustrerende når prisen svinger. Bruker dere mye strøm til oppvarming, eller er det mest vanlig forbruk?" },
+    { "speaker": "kunde", "text": "Vi har varmepumpe og to barn, så det går nok en del. Men jeg er lei av at det er uforutsigbart." },
+    { "speaker": "agent", "text": "Det forstår jeg godt. Vi har faktisk en fastprisavtale nå som ligger på 79 øre per kilowattime i tolv måneder, uten skjulte gebyrer. Det ville gitt deg den forutsigbarheten du etterspør." },
+    { "speaker": "kunde", "text": "Hm. Men er det noen bindingstid på den?" },
+    { "speaker": "agent", "text": "Det er tolv måneder binding på fastprisen, men du kan gå tilbake til spot kostnadsfritt etterpå. Jeg kan også fjerne det månedlige fastbeløpet på 39 kroner for deg som lojal kunde." },
+    { "speaker": "kunde", "text": "Det hørtes faktisk bedre ut enn jeg trodde. Kan du sende meg det skriftlig så jeg får tenkt på det?" },
+    { "speaker": "agent", "text": "Absolutt. Jeg sender deg avtalevilkårene på e-post i dag. Skal jeg sette deg opp på fastprisavtalen midlertidig, så har du angrerett i fjorten dager?" },
+    { "speaker": "kunde", "text": "Nei, jeg vil lese det først før jeg bestemmer meg. Ikke aktiver noe ennå." },
+    { "speaker": "agent", "text": "Helt i orden, jeg respekterer det. Da sender jeg tilbudet uforpliktende, og du kan ringe oss tilbake når du har bestemt deg. Takk for at du ga oss sjansen, Mona. Ha en fin dag!" },
+    { "speaker": "kunde", "text": "Takk, ha det." }
+  ]
+}

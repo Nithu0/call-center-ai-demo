@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Slik fungerer demoen — Loyalty AI{% endblock %}
+{% block content %}
+
+<style>
+  /* Scoped til guide-siden — egen lane, ingen felles CSS-fil røres. */
+  .guide-lead { color: var(--muted); max-width: 70ch; font-size: 1.02rem; line-height: 1.6; }
+  .guide-lead strong { color: var(--text, inherit); }
+
+  .guide-section-title { margin: 34px 0 4px; font-size: 1.25rem; }
+  .guide-section-sub { color: var(--muted); margin: 0 0 16px; max-width: 70ch; }
+
+  /* Funksjons-kort, nummerert */
+  .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; counter-reset: feat; }
+  .feat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    padding: 18px 20px; display: flex; flex-direction: column; position: relative; }
+  .feat-card::before { counter-increment: feat; content: counter(feat);
+    position: absolute; top: 16px; right: 18px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-weight: 700; font-size: 0.82rem;
+    display: inline-flex; align-items: center; justify-content: center; opacity: 0.9; }
+  .feat-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding-right: 32px; }
+  .feat-ico { font-size: 1.5rem; line-height: 1; }
+  .feat-head h3 { margin: 0; font-size: 1.08rem; }
+  .feat-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.55; margin: 0 0 16px; flex: 1; }
+  .feat-open { align-self: flex-start; text-decoration: none; font-weight: 700; font-size: 0.92rem;
+    color: var(--accent); padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px;
+    transition: background 0.12s ease, border-color 0.12s ease; }
+  .feat-open:hover { background: var(--panel-2, #f8fafc); border-color: var(--accent); }
+
+  /* 5-minutters demo-løype */
+  .route-box { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+    border-radius: 12px; padding: 20px 22px; margin-top: 12px; }
+  .route-box h3 { margin: 0 0 4px; font-size: 1.1rem; }
+  .route-box .route-time { color: var(--muted); font-size: 0.88rem; margin: 0 0 14px; }
+  .route-steps { list-style: none; counter-reset: rstep; margin: 0; padding: 0; }
+  .route-steps li { counter-increment: rstep; position: relative; padding: 8px 0 8px 40px;
+    border-bottom: 1px dashed var(--line); }
+  .route-steps li:last-child { border-bottom: 0; }
+  .route-steps li::before { content: counter(rstep); position: absolute; left: 0; top: 8px;
+    width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff;
+    font-weight: 700; font-size: 0.82rem; display: inline-flex; align-items: center; justify-content: center; }
+  .route-steps strong { color: var(--text, inherit); }
+  .route-steps .rs-desc { color: var(--muted); }
+
+  /* Portabilitets-note */
+  .portab-note { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 20px; margin-top: 12px; color: var(--muted); line-height: 1.6; max-width: 78ch; }
+  .portab-note code { background: var(--panel-2, #eef2f7); padding: 1px 6px; border-radius: 5px;
+    font-size: 0.88em; color: var(--accent); }
+  .portab-note strong { color: var(--text, inherit); }
+</style>
+
+<p><a class="back" href="/">&larr; Alle samtaler</a></p>
+
+<h1>Slik fungerer demoen</h1>
+<p class="guide-lead">
+  Dette er en <strong>norsk call-senter-AI</strong> som lytter til kundesamtaler, skriver dem ned
+  og analyserer dem automatisk — sentiment, henvendelsesårsak, kvalitet og oppfølging.
+  Denne siden er laget for deg som er <strong>leder</strong> og vil se demoen på egen hånd:
+  du trenger ingen teknisk bakgrunn. Klikk deg gjennom kortene under, eller følg den anbefalte
+  demo-løypa lenger nede.
+</p>
+
+<!-- ============ FUNKSJONENE ============ -->
+<h2 class="guide-section-title">Funksjonene, steg for steg</h2>
+<p class="guide-section-sub">
+  Hver funksjon har sin egen side. Trykk «Åpne →» for å gå rett dit.
+</p>
+
+<div class="feat-grid">
+  {% for f in features %}
+  <div class="feat-card">
+    <div class="feat-head">
+      <span class="feat-ico" aria-hidden="true">{{ f.icon }}</span>
+      <h3>{{ f.title }}</h3>
+    </div>
+    <p class="feat-desc">{{ f.desc }}</p>
+    <a class="feat-open" href="{{ f.href }}">Åpne &rarr;</a>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ============ 5-MINUTTERS DEMO-LØYPE ============ -->
+<h2 class="guide-section-title">Anbefalt demo-løype</h2>
+<p class="guide-section-sub">
+  Skal du vise demoen i et møte? Følg denne rekkefølgen — den tar rundt fem minutter og
+  bygger en naturlig historie fra «se det skje» til «her er verdien».
+</p>
+
+<div class="route-box">
+  <h3>5-minutters demo-løype</h3>
+  <p class="route-time">⏱ Ca. 5 minutter — fire steg</p>
+  <ol class="route-steps">
+    <li>
+      <strong>Live tale-til-tekst</strong> —
+      <span class="rs-desc">åpne <a href="/live">/live</a>, snakk inn en kort samtale, og la
+      analysen dukke opp i sanntid. Dette er øyeblikket som overbeviser.</span>
+    </li>
+    <li>
+      <strong>Dashboard</strong> —
+      <span class="rs-desc">gå til <a href="/dashboard">/dashboard</a> og vis helheten:
+      mange samtaler oppsummert på ett sted.</span>
+    </li>
+    <li>
+      <strong>Effekt &amp; ROI</strong> —
+      <span class="rs-desc">åpne <a href="/eval">/eval</a> og dra i sliderne for å regne ut
+      spart tid og kroner på publikums eget volum.</span>
+    </li>
+    <li>
+      <strong>Bytt til Azure-tesen</strong> —
+      <span class="rs-desc">avslutt med poenget om at samme kode kjører lokalt i dag og på
+      Azure i morgen — se noten under.</span>
+    </li>
+  </ol>
+</div>
+
+<!-- ============ LOKAL ↔ AZURE ============ -->
+<h2 class="guide-section-title">Lokalt i dag, Azure i morgen</h2>
+<div class="portab-note">
+  <p style="margin-top:0;">
+    Demoen kjører nå <strong>{{ 'på Azure' if banner.is_azure else 'lokalt' }}</strong>
+    (<code>DEPLOY_TARGET={{ banner.deploy_target | upper }}</code>). Poenget er at det er
+    <strong>samme løsning</strong> uansett: for å flytte den til Microsoft Azure er det i praksis
+    nok å endre et par innstillinger — ingen ny utvikling.
+  </p>
+  <p style="margin-bottom:0;">
+    Det betyr også at <strong>sensitive opplysninger kan holdes lokalt eller innenfor EU</strong>.
+    Dere bestemmer selv hvor dataene skal ligge, uten å bytte verktøy. Det gjør det trygt å starte
+    en pilot på egen maskin og skalere opp i skyen når dere er klare.
+  </p>
+</div>
+
+{% endblock %}
