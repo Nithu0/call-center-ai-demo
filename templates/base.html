@@ -38,6 +38,9 @@
         <a class="nav-link {{ 'is-active' if path.startswith('/rapport') else '' }}" href="/rapport">
           <span class="nav-ico" aria-hidden="true">📄</span> Rapport
         </a>
+        <a class="nav-link {{ 'is-active' if path.startswith('/veiviser') else '' }}" href="/veiviser">
+          <span class="nav-ico" aria-hidden="true">🧭</span> Veiviser
+        </a>
 
         {% set in_more = path.startswith('/stt') or path.startswith('/personvern') or path.startswith('/redaction') or path.startswith('/agent-assist') or path.startswith('/guide') %}
         <details class="nav-more {{ 'is-active' if in_more else '' }}">

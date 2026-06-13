@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  .vz-wrap { max-width: 980px; }
+  .vz-intro { color: var(--muted); margin-bottom: 18px; }
+  .vz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 820px) { .vz-grid { grid-template-columns: 1fr; } }
+  .q { margin-bottom: 18px; }
+  .q-label { font-weight: 600; margin-bottom: 8px; }
+  .q-help { color: var(--muted); font-size: .85em; font-weight: 400; }
+  .seg { display: flex; flex-wrap: wrap; gap: 8px; }
+  .seg button { background: var(--panel-2, rgba(255,255,255,.04)); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; cursor: pointer; font-size: .92em; }
+  .seg button.active { background: var(--brand-tint, rgba(45,212,191,.15)); border-color: var(--brand); color: var(--ink); font-weight: 600; }
+  .rec { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; position: sticky; top: 90px; }
+  .rec h3 { margin: 0 0 4px; }
+  .rec-row { padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .rec-row:last-of-type { border-bottom: none; }
+  .rec-k { font-size: .8em; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .rec-v { font-weight: 600; font-size: 1.05em; margin: 2px 0; }
+  .rec-why { color: var(--muted); font-size: .9em; }
+  .priv { border-radius: 8px; padding: 10px 12px; font-size: .9em; margin-top: 4px; }
+  .priv.good { background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.35); }
+  .priv.mid  { background: rgba(148,163,184,.12); border: 1px solid rgba(148,163,184,.3); }
+  .priv.warn { background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.4); }
+  .envbox { background: #0b1220; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+    font-family: ui-monospace, monospace; font-size: .85em; white-space: pre; margin-top: 6px; color: #cbd5e1; }
+  .where { display: flex; gap: 12px; margin-top: 6px; }
+  .where div { flex: 1; text-align: center; border: 1px solid var(--line); border-radius: 8px; padding: 12px; opacity: .45; font-size: .9em; }
+  .where div.on { opacity: 1; border-color: var(--brand); background: var(--brand-tint, rgba(45,212,191,.1)); font-weight: 600; }
+  .needs { margin-top: 18px; }
+  .needs li { margin: 4px 0; }
+</style>
+
+<div class="vz-wrap">
+  <h1>Veiviser — velg riktig oppsett</h1>
+  <p class="vz-intro">Svar på 5 enkle spørsmål. Du får en konkret anbefaling for <b>transkripsjon</b>,
+  <b>analyse</b> og <b>hvor det bør bygges</b> — med begrunnelse og ferdig oppsett. Alt oppdateres live.</p>
+
+  <div class="vz-grid">
+    <!-- VENSTRE: spørsmål -->
+    <div>
+      <div class="q">
+        <div class="q-label">1. Hvor sensitive er dataene? <span class="q-help">samtaleopptak = sensitive persondata</span></div>
+        <div class="seg" data-q="sensitiv">
+          <button data-v="ja" class="active">Sensitive (opptak, personnummer)</button>
+          <button data-v="nei">Vanlige forretningsdata</button>
+        </div>
+      </div>
+      <div class="q">
+        <div class="q-label">2. Volum — samtaler per måned?</div>
+        <div class="seg" data-q="volum">
+          <button data-v="lav">Lavt (&lt; 5 000)</button>
+          <button data-v="middels">Middels</button>
+          <button data-v="høy" class="active">Høyt (&gt; 50 000)</button>
+        </div>
+      </div>
+      <div class="q">
+        <div class="q-label">3. Vil dere eie utstyret eller bruke sky?</div>
+        <div class="seg" data-q="eie">
+          <button data-v="egen">Egen maskin (eie)</button>
+          <button data-v="sky" class="active">Sky (slippe drift)</button>
+        </div>
+      </div>
+      <div class="q">
+        <div class="q-label">4. Hvor viktig er norsk-nøyaktighet? <span class="q-help">dialekter + telefonlyd</span></div>
+        <div class="seg" data-q="norsk">
+          <button data-v="kritisk" class="active">Kritisk</button>
+          <button data-v="viktig">Viktig</button>
+          <button data-v="ok">Grei</button>
+        </div>
+      </div>
+      <div class="q">
+        <div class="q-label">5. Tempo til første pilot?</div>
+        <div class="seg" data-q="tempo">
+          <button data-v="rask" class="active">Raskest mulig</button>
+          <button data-v="rolig">Vi tar tiden</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HØYRE: anbefaling -->
+    <div class="rec">
+      <h3>Vår anbefaling</h3>
+      <div class="where" id="rec-where">
+        <div id="w-local">🏠 Hos dere<br>(lokal server)</div>
+        <div id="w-cloud">☁️ Azure / sky<br>(EU)</div>
+      </div>
+      <div class="rec-row">
+        <div class="rec-k">🎙️ Transkripsjon (STT)</div>
+        <div class="rec-v" id="rec-stt">—</div>
+        <div class="rec-why" id="rec-stt-why">—</div>
+      </div>
+      <div class="rec-row">
+        <div class="rec-k">🧠 Analyse</div>
+        <div class="rec-v" id="rec-llm">—</div>
+        <div class="rec-why" id="rec-llm-why">—</div>
+      </div>
+      <div class="rec-row">
+        <div class="rec-k">🏗️ Hvor det bygges</div>
+        <div class="rec-v" id="rec-deploy">—</div>
+        <div class="rec-why" id="rec-deploy-why">—</div>
+      </div>
+      <div class="rec-row">
+        <div class="rec-k">🔒 Personvern</div>
+        <div class="priv" id="rec-priv">—</div>
+      </div>
+      <div class="rec-row">
+        <div class="rec-k">⚙️ Ferdig oppsett (.env)</div>
+        <div class="envbox" id="rec-env">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="needs">
+    <h3>Slik løser dette det Loyalty er ute etter</h3>
+    <ul>
+      <li>✅ <b>Norsk tale-til-tekst</b> for store samtalevolum — valgt modell tilpasses norsk + telefonlyd.</li>
+      <li>✅ <b>Personvern</b> — sensitive opptak holdes lokalt eller i EU (ikke en amerikansk sky).</li>
+      <li>✅ <b>Pilot med dokumentert effekt</b> — samme oppsett gir QA-scorecard, sammendrag og ROI-tall (se Effekt-siden).</li>
+      <li>✅ <b>Skala uten å bytte løsning</b> — samme kode kjører lokalt eller i sky; bytt to innstillinger.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+(function () {
+  const state = { sensitiv: "ja", volum: "høy", eie: "sky", norsk: "kritisk", tempo: "rask" };
+
+  function recommend(s) {
+    const highVol = s.volum === "høy";
+    const ownHw = s.eie === "egen";
+    const norskKritisk = s.norsk === "kritisk";
+    let r = { env: {} };
+
+    // Hvor bygges + STT
+    if (ownHw || (s.sensitiv === "ja" && (norskKritisk || highVol))) {
+      r.deploy = "NB-Whisper self-hosted (egen maskin eller Azure-GPU)";
+      r.deployWhy = "Data forlater aldri dere/EU — sterkeste personvern, og billigst ved høyt volum (egen modell, ingen per-minutt-regning).";
+      r.stt = "NB-Whisper (norsk-tunet, self-hosted)";
+      r.sttWhy = "Best norsk-nøyaktighet, kjører uten nøkkel/uten amerikansk sky. Full kontroll.";
+      r.env.DEPLOY_TARGET = "local"; r.env.STT_BACKEND = "nb-whisper";
+      r.local = true;
+    } else if (s.sensitiv === "ja") {
+      r.deploy = "Azure (EU-region: Norge/Sverige)";
+      r.deployWhy = "Data behandles i EU under databehandleravtale — trygt for sensitive opptak, uten at dere drifter egen maskin.";
+      r.stt = "Azure AI Speech (nb-NO, EU)";
+      r.sttWhy = "Sterk norsk, EU-databehandling, skalerer i sky og er raskt å sette opp.";
+      r.env.DEPLOY_TARGET = "azure"; r.env.STT_BACKEND = "azure";
+      r.local = false;
+    } else {
+      r.deploy = (s.tempo === "rask") ? "Sky-API (raskest å koble på)" : "Azure (EU) eller lokal";
+      r.deployWhy = "Ikke-sensitive data → dere kan bruke en enkel sky-API og være i gang på minutter.";
+      r.stt = "OpenAI Whisper API";
+      r.sttWhy = "Lavest friksjon: bare en API-nøkkel, billig. (Data går til USA — derfor kun for ikke-sensitivt.)";
+      r.env.DEPLOY_TARGET = "local"; r.env.STT_BACKEND = "openai";
+      r.local = true;
+    }
+
+    // Analyse (LLM)
+    if (r.env.DEPLOY_TARGET === "azure") {
+      r.llm = "Azure OpenAI (EU)";
+      r.llmWhy = "Samme EU-region som lyden — sterk analyse uten at data forlater EU.";
+      r.env.LLM_BACKEND = "azure-openai";
+    } else if (ownHw && s.sensitiv === "ja") {
+      r.llm = "Lokal: regelbasert nå → egen LLM-server senere";
+      r.llmWhy = "Holder alt lokalt. Regelbasert analyse er gratis og god nok til pilot; en lokal LLM (Ollama) legges til når dere vil ha dypere innsikt.";
+      r.env.LLM_BACKEND = "mock";
+    } else {
+      r.llm = "Claude (Anthropic)";
+      r.llmWhy = "Sterkeste analyse-kvalitet. (Data går til leverandør — greit for ikke-sensitivt eller med databehandleravtale.)";
+      r.env.LLM_BACKEND = "anthropic";
+    }
+
+    // Personvern
+    const us = (r.env.STT_BACKEND === "openai" || r.env.LLM_BACKEND === "anthropic");
+    if (r.env.DEPLOY_TARGET === "local" && r.env.STT_BACKEND.indexOf("whisper") > -1 && r.env.LLM_BACKEND === "mock") {
+      r.priv = "🟢 Alt lokalt — ingenting forlater maskinen. Tryggest for sensitive kundeopptak."; r.privCls = "good";
+    } else if (r.env.DEPLOY_TARGET === "azure") {
+      r.priv = "🟢 Data behandles i EU (Azure) under databehandleravtale. Trygt for sensitive data."; r.privCls = "good";
+    } else if (us && s.sensitiv === "ja") {
+      r.priv = "🟠 OBS: denne veien sender data til USA — IKKE for sensitive kundeopptak uten juridisk vurdering. Vurder NB-Whisper/Azure i stedet."; r.privCls = "warn";
+    } else {
+      r.priv = "⚪ Delvis ekstern behandling — greit for ikke-sensitive data."; r.privCls = "mid";
+    }
+    return r;
+  }
+
+  function render() {
+    const r = recommend(state);
+    document.getElementById("rec-stt").textContent = r.stt;
+    document.getElementById("rec-stt-why").textContent = r.sttWhy;
+    document.getElementById("rec-llm").textContent = r.llm;
+    document.getElementById("rec-llm-why").textContent = r.llmWhy;
+    document.getElementById("rec-deploy").textContent = r.deploy;
+    document.getElementById("rec-deploy-why").textContent = r.deployWhy;
+    const p = document.getElementById("rec-priv");
+    p.textContent = r.priv; p.className = "priv " + r.privCls;
+    document.getElementById("rec-env").textContent =
+      "DEPLOY_TARGET=" + r.env.DEPLOY_TARGET + "\nSTT_BACKEND=" + r.env.STT_BACKEND + "\nLLM_BACKEND=" + r.env.LLM_BACKEND;
+    document.getElementById("w-local").classList.toggle("on", r.local);
+    document.getElementById("w-cloud").classList.toggle("on", !r.local);
+  }
+
+  document.querySelectorAll(".seg").forEach(seg => {
+    const q = seg.getAttribute("data-q");
+    seg.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        seg.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state[q] = btn.getAttribute("data-v");
+        render();
+      });
+    });
+  });
+  render();
+})();
+</script>
+{% endblock %}
