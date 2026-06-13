@@ -511,3 +511,35 @@ h1 { font-size: 1.7rem; margin: 0 0 10px; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   FORENKLET DEMO-UTSEENDE — rolig, oversiktlig (mindre "flashy").
+   Beholder informative farger (sentiment/churn/QA); fjerner glød, tekst-
+   gradienter, tunge animasjoner og blur. Lagt sist → vinner.
+   ════════════════════════════════════════════════════════════════════════ */
+:root { --shadow: 0 1px 2px rgba(0,0,0,.18); --shadow-glow: 0 1px 2px rgba(0,0,0,.18); }
+body { background: var(--bg) !important; }
+.topbar { background: var(--panel) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.logo { background: none !important; -webkit-background-clip: initial !important; -webkit-text-fill-color: var(--brand) !important; color: var(--brand) !important; }
+h1, h2, .hero h1, .hero-title { background: none !important; -webkit-background-clip: initial !important; -webkit-text-fill-color: currentColor !important; color: var(--ink) !important; }
+.hero { background: var(--panel) !important; box-shadow: none !important; border: 1px solid var(--line); }
+.call-card, .panel, .a-block, .kpi-card, .stat { box-shadow: var(--shadow) !important; }
+.call-card { animation: none !important; }
+.call-card:hover { transform: none !important; box-shadow: var(--shadow) !important; border-color: var(--brand-line) !important; }
+.btn { box-shadow: none !important; }
+.btn:hover { transform: none !important; filter: brightness(1.04) !important; box-shadow: none !important; }
+.deploy-dot { box-shadow: none !important; }
+.fill-good { background: var(--pass) !important; }
+.fill-mid  { background: var(--warn) !important; }
+.fill-bad  { background: var(--fail) !important; }
+.a-block { animation: none !important; }
+
+/* "Slik er analysen laget"-boks */
+.basis-box { background: var(--panel-2, rgba(255,255,255,.03)); border: 1px solid var(--line); border-left: 3px solid var(--brand); border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; font-size: .92em; }
+.basis-title { font-weight: 600; margin-bottom: 8px; color: var(--ink); }
+.basis-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.basis-list li { display: grid; grid-template-columns: 130px 1fr; gap: 10px; align-items: baseline; }
+.basis-k { color: var(--muted); font-size: .9em; }
+.basis-v { color: var(--ink); }
+.basis-foot { margin: 10px 0 0; color: var(--muted); font-size: .88em; }
+@media (max-width: 560px) { .basis-list li { grid-template-columns: 1fr; gap: 2px; } }

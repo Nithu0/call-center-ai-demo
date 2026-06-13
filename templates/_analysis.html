@@ -1,5 +1,37 @@
 {# Analyse-fragment — gjenbrukes ved første render og ved "kjør på nytt" #}
-<p class="backend-note">Analysert av backend: <code>{{ analysis.backend }}</code></p>
+<div class="basis-box">
+  <div class="basis-title">ℹ️ Slik er denne analysen laget</div>
+  <ul class="basis-list">
+    <li>
+      <span class="basis-k">Transkripsjon</span>
+      <span class="basis-v">
+        {%- if banner and banner.stt_backend == 'mock' %}ferdig demo-tekst (ingen ekte lydtranskripsjon i testmodus)
+        {%- elif banner and 'whisper' in banner.stt_backend %}{{ banner.stt_backend }} — lokal norsk modell (NB-Whisper)
+        {%- elif banner and banner.stt_backend == 'openai' %}OpenAI Whisper API
+        {%- elif banner and banner.stt_backend == 'azure' %}Azure AI Speech (EU-region)
+        {%- else %}{{ banner.stt_backend if banner else 'mock' }}{% endif %}
+      </span>
+    </li>
+    <li>
+      <span class="basis-k">Analyse-motor</span>
+      <span class="basis-v">
+        {%- if analysis.backend == 'mock' %}regelbasert — deterministiske norske nøkkelord-regler, ingen ekstern AI
+        {%- elif analysis.backend == 'anthropic' %}Claude Opus (Anthropic)
+        {%- elif 'azure' in analysis.backend %}Azure OpenAI (EU-region)
+        {%- else %}{{ analysis.backend }}{% endif %}
+      </span>
+    </li>
+    <li>
+      <span class="basis-k">Datahåndtering</span>
+      <span class="basis-v">
+        {%- if analysis.backend == 'mock' and banner and banner.stt_backend == 'mock' %}alt kjører lokalt — ingenting sendes ut av maskinen
+        {%- elif banner and banner.is_azure %}behandles i Azure (EU-region), data forlater ikke EU
+        {%- else %}delvis via ekstern API — se Personvern-siden{% endif %}
+      </span>
+    </li>
+  </ul>
+  <p class="basis-foot">QA-poengene under er regelbaserte og viser <b>begrunnelse per punkt</b> — hva i samtalen som utløste hvert kryss.</p>
+</div>
 
 <div class="a-block">
   <h3>Sammendrag</h3>
