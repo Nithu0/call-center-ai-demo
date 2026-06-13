@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}Backend-status — Loyalty AI{% endblock %}
+{% block content %}
+
+<style>
+  .st-wrap { max-width: 1000px; margin: 0 auto; }
+  .st-lead { color: var(--muted, #9aa7bd); margin: .2rem 0 1.4rem; line-height: 1.5; }
+  .st-lead code {
+    background: rgba(255,255,255,.06); padding: .08em .4em; border-radius: 4px;
+    font-size: .92em;
+  }
+
+  /* Aktiv-oppsummering: to kort som viser hva som kjører NÅ */
+  .st-active-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.6rem;
+  }
+  @media (max-width: 680px) { .st-active-grid { grid-template-columns: 1fr; } }
+  .st-active-card {
+    border: 1px solid rgba(255,255,255,.10); border-radius: 12px;
+    padding: 1rem 1.1rem; background: rgba(255,255,255,.025);
+  }
+  .st-active-card .st-ac-head {
+    font-size: .78rem; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted, #9aa7bd); margin-bottom: .35rem;
+  }
+  .st-active-card .st-ac-name {
+    font-size: 1.35rem; font-weight: 700; display: flex; align-items: center; gap: .5rem;
+  }
+  .st-active-card .st-ac-sub { color: var(--muted, #9aa7bd); font-size: .9rem; margin-top: .4rem; }
+  .st-active-card.is-ok    { border-color: rgba( 74,222,128,.35); }
+  .st-active-card.is-warn  { border-color: rgba(250,204, 21,.40); }
+
+  /* Tabell */
+  .st-section-title { font-size: 1.05rem; margin: 1.6rem 0 .6rem; }
+  .st-table {
+    width: 100%; border-collapse: collapse; font-size: .92rem;
+    border: 1px solid rgba(255,255,255,.08); border-radius: 12px; overflow: hidden;
+  }
+  .st-table th, .st-table td {
+    text-align: left; padding: .62rem .8rem; border-bottom: 1px solid rgba(255,255,255,.06);
+    vertical-align: middle;
+  }
+  .st-table th {
+    font-size: .72rem; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--muted, #9aa7bd); background: rgba(255,255,255,.03); font-weight: 600;
+  }
+  .st-table tr:last-child td { border-bottom: none; }
+  .st-table tr.is-active { background: rgba(96,165,250,.10); }
+
+  .st-be { font-weight: 600; }
+  .st-be .st-active-tag {
+    display: inline-block; margin-left: .45rem; font-size: .68rem; font-weight: 700;
+    letter-spacing: .04em; padding: .1em .5em; border-radius: 999px;
+    background: rgba(96,165,250,.20); color: #93c5fd; vertical-align: middle;
+  }
+
+  /* Fargekodede status-pills */
+  .st-pill {
+    display: inline-block; padding: .14em .6em; border-radius: 999px;
+    font-size: .82rem; font-weight: 600; white-space: nowrap;
+  }
+  .st-pill.ready       { background: rgba( 74,222,128,.16); color: #4ade80; }
+  .st-pill.missing_key { background: rgba(250,204, 21,.16); color: #facc15; }
+  .st-pill.missing_pkg { background: rgba(248,113,113,.16); color: #f87171; }
+
+  .st-cell-ok   { color: #4ade80; }
+  .st-cell-bad  { color: #f87171; }
+  .st-cell-warn { color: #facc15; }
+  .st-cell-na   { color: var(--muted, #9aa7bd); }
+
+  .st-note { color: var(--muted, #9aa7bd); font-size: .85rem; }
+
+  .st-legend {
+    margin-top: 1.4rem; padding: .9rem 1rem; border-radius: 10px;
+    background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.08);
+    color: var(--muted, #9aa7bd); font-size: .87rem; line-height: 1.6;
+  }
+  .st-legend b { color: #d7deea; }
+  .st-safe {
+    margin-top: 1rem; font-size: .82rem; color: var(--muted, #9aa7bd);
+  }
+</style>
+
+<div class="st-wrap">
+  <h1>🔌 Backend-status</h1>
+  <p class="st-lead">
+    Selvtest av hver tale-til-tekst (STT)- og analyse (LLM)-backend: er pakken
+    installert, og er nøkkelen satt? Alt sjekkes <b>uten</b> å trigge ekte
+    (betalte) API-kall — vi leser bare hva som er installert og konfigurert.
+    Nøkler vises kun som <code>PRESENT</code>/<code>MISSING</code>, aldri verdien.
+  </p>
+
+  <!-- Hva kjører NÅ -->
+  <div class="st-active-grid">
+    <div class="st-active-card {{ 'is-ok' if stt_active_row and stt_active_row.state == 'ready' else 'is-warn' }}">
+      <div class="st-ac-head">Aktiv STT (tale → tekst)</div>
+      <div class="st-ac-name">
+        <span>{{ stt_active }}</span>
+        {% if stt_active_row %}<span class="st-pill {{ stt_active_row.state }}">{{ stt_active_row.status_text }}</span>{% endif %}
+      </div>
+      <div class="st-ac-sub">
+        {% if supports_audio %}Kan transkribere <b>ekte opplastet lyd</b>.{% else %}Slår kun opp ferdige demo-samples — <b>ikke</b> ekte lyd-transkripsjon.{% endif %}
+      </div>
+    </div>
+
+    <div class="st-active-card {{ 'is-ok' if llm_active_row and llm_active_row.state == 'ready' else 'is-warn' }}">
+      <div class="st-ac-head">Aktiv LLM (analyse)</div>
+      <div class="st-ac-name">
+        <span>{{ llm_active }}</span>
+        {% if llm_active_row %}<span class="st-pill {{ llm_active_row.state }}">{{ llm_active_row.status_text }}</span>{% endif %}
+      </div>
+      <div class="st-ac-sub">
+        DEPLOY_TARGET = <b>{{ banner.deploy_target | upper }}</b>{% if is_azure %} — peker mot Azure (EU){% else %} — lokalt/offline{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- STT-tabell -->
+  <h2 class="st-section-title">🎧 STT-backends</h2>
+  <table class="st-table">
+    <thead>
+      <tr>
+        <th>Backend</th>
+        <th>Pakke</th>
+        <th>Nøkkel</th>
+        <th>Status</th>
+        <th>Merknad</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in stt_rows %}
+      <tr class="{{ 'is-active' if r.is_active else '' }}">
+        <td class="st-be">
+          {{ r.label }}
+          {% if r.is_active %}<span class="st-active-tag">● aktiv</span>{% endif %}
+        </td>
+        <td>
+          {% if r.pkg is none %}<span class="st-cell-na">—</span>
+          {% elif r.pkg_ok %}<span class="st-cell-ok">{{ r.pkg_cell }}</span>
+          {% else %}<span class="st-cell-bad">{{ r.pkg_cell }}</span>{% endif %}
+          {% if r.pkg %}<div class="st-note"><code>{{ r.pkg }}</code></div>{% endif %}
+        </td>
+        <td>
+          {% if r.env_key is none %}<span class="st-cell-na">—</span>
+          {% elif r.key_ok %}<span class="st-cell-ok">PRESENT</span>
+          {% else %}<span class="st-cell-warn">MISSING</span>{% endif %}
+          {% if r.env_key %}<div class="st-note">{{ r.env_key }}</div>{% endif %}
+        </td>
+        <td><span class="st-pill {{ r.state }}">{{ r.status_text }}</span></td>
+        <td class="st-note">{{ r.note }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- LLM-tabell -->
+  <h2 class="st-section-title">✨ LLM-backends (analyse)</h2>
+  <table class="st-table">
+    <thead>
+      <tr>
+        <th>Backend</th>
+        <th>Pakke</th>
+        <th>Nøkkel</th>
+        <th>Status</th>
+        <th>Merknad</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in llm_rows %}
+      <tr class="{{ 'is-active' if r.is_active else '' }}">
+        <td class="st-be">
+          {{ r.label }}
+          {% if r.is_active %}<span class="st-active-tag">● aktiv</span>{% endif %}
+        </td>
+        <td>
+          {% if r.pkg is none %}<span class="st-cell-na">—</span>
+          {% elif r.pkg_ok %}<span class="st-cell-ok">{{ r.pkg_cell }}</span>
+          {% else %}<span class="st-cell-bad">{{ r.pkg_cell }}</span>{% endif %}
+          {% if r.pkg %}<div class="st-note"><code>{{ r.pkg }}</code></div>{% endif %}
+        </td>
+        <td>
+          {% if r.env_key is none %}<span class="st-cell-na">—</span>
+          {% elif r.key_ok %}<span class="st-cell-ok">PRESENT</span>
+          {% else %}<span class="st-cell-warn">MISSING</span>{% endif %}
+          {% if r.env_key %}<div class="st-note">{{ r.env_key }}</div>{% endif %}
+        </td>
+        <td><span class="st-pill {{ r.state }}">{{ r.status_text }}</span></td>
+        <td class="st-note">{{ r.note }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="st-legend">
+    <b>faster-whisper / nb-whisper</b> = lokal, ingen nøkkel, ingen Azure.
+    <b>openai / anthropic / azure</b> = krever nøkkel (betalt API).
+    <b>mock</b> = offline, alltid klar.
+    <br>
+    Tegnforklaring: <span class="st-pill ready">✓ klar</span> alt på plass ·
+    <span class="st-pill missing_key">⚠ mangler nøkkel</span> pakke ok, men nøkkel ikke satt ·
+    <span class="st-pill missing_pkg">⚠ mangler pakke</span> kjør pip install.
+  </div>
+
+  <p class="st-safe">
+    Denne siden gjør kun trygge sjekker (<code>importlib.util.find_spec</code> +
+    <code>os.environ</code>). Ingen lyd transkriberes og ingen LLM kalles.
+  </p>
+</div>
+{% endblock %}

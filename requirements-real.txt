@@ -1,0 +1,29 @@
+# =====================================================================
+#  requirements-real.txt — EKTE verktøy for call-senter-AI-demoen
+# =====================================================================
+#  Kjernen i requirements.txt er nok til mock/offline-demo. Denne fila
+#  legger til de VALGFRIE ekte backendene. Installeres med setup-real.sh.
+#
+#  Nøkkel-status per gruppe:
+#    - faster-whisper + gTTS = INGEN nøkkel, INGEN Azure. Kjører lokalt (CPU).
+#    - openai / anthropic    = krever API-nøkkel i .env.
+#    - nb-whisper (torch)    = ingen nøkkel, men tungt (~GB nedlasting).
+# =====================================================================
+
+# --- Lokal STT (INGEN nøkkel — kjører på CPU via ctranslate2) ---
+faster-whisper==1.0.3
+
+# --- Norsk TTS for å generere testlyd (INGEN nøkkel; gTTS bruker nett) ---
+gTTS==2.5.1
+
+# --- OpenAI: Whisper STT-API (STT_BACKEND=openai) + ev. LLM (krever OPENAI_API_KEY) ---
+openai==1.40.0
+
+# --- Anthropic: Claude-analyse (LLM_BACKEND=anthropic — krever ANTHROPIC_API_KEY) ---
+anthropic==0.40.0
+
+# --- nb-whisper (tyngre, VALGFRI): norsk NB-Whisper via transformers + torch ---
+#     Installeres KUN med:  ./setup-real.sh --nb-whisper
+#     Ingen nøkkel, men torch er stort (~GB). Avkommenter hvis du pinner manuelt.
+# transformers==4.44.2
+# torch==2.4.0
