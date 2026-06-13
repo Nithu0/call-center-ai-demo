@@ -102,5 +102,70 @@
       "avslutning": 1
     },
     "total_pct": 100
+  },
+  "stromselskap_oppsigelse": {
+    "call_reason": "Kunde vil bytte strømleverandør pga pris, beholdt via uforpliktende fastpristilbud",
+    "sentiment": "positiv",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 1,
+      "avslutning": 1
+    },
+    "total_pct": 100
+  },
+  "teleselskap_mersalg": {
+    "call_reason": "Treg mobildata pga oppbrukt kvote, oppgradert til større abonnement (mersalg)",
+    "sentiment": "positiv",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 1,
+      "avslutning": 1
+    },
+    "total_pct": 100
+  },
+  "forsikring_skademelding": {
+    "call_reason": "Vannlekkasje i kjeller, skadesak opprettet og saneringsfirma sendt ut",
+    "sentiment": "positiv",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 0,
+      "avslutning": 1
+    },
+    "total_pct": 83
+  },
+  "bank_mistenkelig": {
+    "call_reason": "Mistenkelig kortbruk i utlandet, ID-verifisert og kort sperret",
+    "sentiment": "positiv",
+    "scorecard": {
+      "hilsen": 1,
+      "identifisering": 1,
+      "behovskartlegging": 1,
+      "losning": 1,
+      "samtykke": 1,
+      "avslutning": 1
+    },
+    "total_pct": 100
+  },
+  "vanskelig_sint_kunde": {
+    "call_reason": "Forsinket ekspresslevering, agent avviser ansvar og håndterer dårlig",
+    "sentiment": "negativ",
+    "scorecard": {
+      "hilsen": 0,
+      "identifisering": 1,
+      "behovskartlegging": 0,
+      "losning": 0,
+      "samtykke": 0,
+      "avslutning": 0
+    },
+    "total_pct": 17
   }
 }
