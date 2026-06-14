@@ -106,6 +106,14 @@ _STT_BACKENDS = [
         "note": "OpenAI Whisper API — krever nøkkel (betalt)",
     },
     {
+        "id": "elevenlabs",
+        "label": "elevenlabs",
+        "pkg": "httpx",
+        "pip": "httpx",
+        "env_key": "ELEVENLABS_API_KEY",
+        "note": "ElevenLabs Scribe — sky-STT med taler-separasjon, krever nøkkel (betalt)",
+    },
+    {
         "id": "azure",
         "label": "azure",
         "pkg": "azure.cognitiveservices.speech",

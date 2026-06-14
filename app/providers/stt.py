@@ -290,6 +290,86 @@ def _transcribe_openai(audio_or_name: str) -> Transcript:
     )
 
 
+def _diarized_words_to_turns(words: list[dict]) -> list[Turn]:
+    """Gjør ElevenLabs Scribe sine diariserte ord om til agent/kunde-replikker.
+
+    Hvert ord har `speaker_id`. Første taler som dukker opp = agent, neste = kunde
+    (gjelder en 2-parts samtale; flere talere enn 2 mappes vekselvis).
+    """
+    order: dict[str, int] = {}
+    turns: list[Turn] = []
+    cur_sp: str | None = None
+    buf: list[str] = []
+
+    def flush() -> None:
+        text = "".join(buf).strip()
+        if text:
+            label = "agent" if order.get(cur_sp, 0) % 2 == 0 else "kunde"
+            turns.append(Turn(speaker=label, text=text))
+
+    for w in words:
+        sp = w.get("speaker_id") or "speaker_0"
+        if sp not in order:
+            order[sp] = len(order)
+        if cur_sp is not None and sp != cur_sp:
+            flush()
+            buf.clear()
+        cur_sp = sp
+        buf.append(str(w.get("text", "")))
+    flush()
+    return turns or [Turn(speaker="agent", text="(tom transkripsjon)")]
+
+
+def _transcribe_elevenlabs(audio_or_name: str) -> Transcript:
+    """ElevenLabs Scribe (sky) — PROFESJONELL STT med innebygd taler-separasjon.
+
+    Krever bare ELEVENLABS_API_KEY (ingen GPU, ingen egen modell). Diariserer
+    agent/kunde automatisk — bedre enn Whisper som trenger et eget diariserings-steg.
+    NB: lyd sendes til ElevenLabs (utenfor EU) — vurder personvern for ekte kundedata.
+
+    Aktiver:  STT_BACKEND=elevenlabs  ·  ELEVENLABS_API_KEY=...   (bruker httpx, ingen ekstra pakke)
+    Modell via ELEVENLABS_STT_MODEL (default scribe_v1).
+    """
+    import os
+
+    key = os.environ.get("ELEVENLABS_API_KEY")
+    if not key:
+        raise RuntimeError(
+            "STT_BACKEND=elevenlabs krever ELEVENLABS_API_KEY i miljøet/.env. "
+            "Til demo uten nøkkel: bruk DEPLOY_TARGET=local (mock)."
+        )
+    try:
+        import httpx
+    except ImportError:  # pragma: no cover
+        warnings.warn("httpx mangler — faller tilbake til mock.", stacklevel=2)
+        return _transcribe_mock(audio_or_name)
+
+    audio_path = _resolve_audio_path(audio_or_name)
+    model = os.environ.get("ELEVENLABS_STT_MODEL", "scribe_v1")
+    with audio_path.open("rb") as fh:
+        resp = httpx.post(
+            "https://api.elevenlabs.io/v1/speech-to-text",
+            headers={"xi-api-key": key},
+            data={"model_id": model, "diarize": "true"},  # språk auto-detekteres
+            files={"file": (audio_path.name, fh, "audio/mpeg")},
+            timeout=180,
+        )
+    resp.raise_for_status()
+    data = resp.json()
+    words = data.get("words") or []
+    turns = (
+        _diarized_words_to_turns(words)
+        if words
+        else [Turn(speaker="agent", text=(data.get("text") or "").strip() or "(tom)")]
+    )
+    return Transcript(
+        name=audio_path.stem,
+        call_type="ukjent",
+        title=f"Ekte transkripsjon (ElevenLabs Scribe): {audio_path.name}",
+        turns=turns,
+    )
+
+
 # --------------------------------------------------------------------------- #
 # Opplastet lyd (bytes ELLER sti) — brukt av /transcribe-endepunktet            #
 # --------------------------------------------------------------------------- #
@@ -306,7 +386,7 @@ def supports_audio(cfg: Settings | None = None) -> bool:
     azure) kan gjøre ekte lyd→tekst (forutsatt at pakke/nøkkel er på plass).
     """
     return (cfg or settings).stt_backend in (
-        "faster-whisper", "nb-whisper", "openai", "azure",
+        "faster-whisper", "nb-whisper", "openai", "elevenlabs", "azure",
     )
 
 
@@ -385,6 +465,8 @@ def transcribe_audio(
             tr = _transcribe_nb_whisper(audio_arg)
         elif backend == "openai":
             tr = _transcribe_openai(audio_arg)
+        elif backend == "elevenlabs":
+            tr = _transcribe_elevenlabs(audio_arg)
         elif backend == "azure":
             tr = _transcribe_azure(audio_arg, cfg)
         else:
@@ -421,6 +503,8 @@ def transcribe(audio_or_name: str, cfg: Settings | None = None) -> Transcript:
         return _transcribe_nb_whisper(audio_or_name)
     if backend == "openai":
         return _transcribe_openai(audio_or_name)
+    if backend == "elevenlabs":
+        return _transcribe_elevenlabs(audio_or_name)
     if backend == "azure":
         return _transcribe_azure(audio_or_name, cfg)
 
