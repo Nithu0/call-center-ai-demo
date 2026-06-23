@@ -56,6 +56,19 @@
   <b>du spiller kunden</b> og svarer med stemmen din. Alt transkriberes live, og til høyre ser du hvordan systemet
   <b>analyserer samtalen i sanntid</b> og hva neste steg bør være. Trykk <b>Start samtalen</b>.</p>
 
+  <div class="card" style="margin-bottom:18px; border-color: rgba(45,212,191,.4);">
+    <div class="an-h">🎙️ Snakk med den ekte AI-selgeren (ElevenLabs)</div>
+    <p style="color:var(--muted); font-size:.92em; margin:4px 0 12px;">
+      Trykk på samtale-widgeten og snakk — dette er en <b>ekte toveis stemmeagent</b> (ElevenLabs Conversational AI),
+      ikke et manus. Manus-demoen under viser i tillegg hvordan analysen fungerer steg for steg.
+    </p>
+    <elevenlabs-convai agent-id="{{ agent_id }}"></elevenlabs-convai>
+    <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async></script>
+    <p class="tts-note" style="margin-top:10px;">
+      Agent-id: <code>{{ agent_id }}</code> (public). Krever mikrofon-tilgang i nettleseren.
+    </p>
+  </div>
+
   <div class="sam-grid">
     <!-- VENSTRE: samtalen -->
     <div class="card">
