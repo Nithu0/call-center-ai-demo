@@ -20,6 +20,7 @@ LLM-nøkkel, gjør analyse-laget allerede ekte LLM når LLM_BACKEND er satt.
 from __future__ import annotations
 
 import base64
+import os
 from pathlib import Path
 
 from fastapi import APIRouter, Request
@@ -206,12 +207,22 @@ def _how_text(backend: str) -> str:
 # --------------------------------------------------------------------------- #
 # Ruter                                                                         #
 # --------------------------------------------------------------------------- #
+# Public ElevenLabs ConvAI-agent (sikkerhet/signed-url kan legges til senere).
+ELEVENLABS_AGENT_ID = os.environ.get(
+    "ELEVENLABS_AGENT_ID", "agent_9801kvt5ws04e3araztj70bktww2"
+)
+
+
 @router.get("/samtale", response_class=HTMLResponse)
 def samtale_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
         request,
         "samtale.html",
-        {"banner": _provider_banner(), "tts_backend": tts.active_backend()},
+        {
+            "banner": _provider_banner(),
+            "tts_backend": tts.active_backend(),
+            "agent_id": ELEVENLABS_AGENT_ID,
+        },
     )
 
 
